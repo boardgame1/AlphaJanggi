@@ -28,6 +28,7 @@ def play_game(config: MuZeroConfig, network: Network) -> Game:
     print('.', end=',', flush=True)
     game.apply(action)
     game.store_search_statistics(root)
+  print()
   return game
 
 # Core Monte Carlo Tree Search algorithm.
