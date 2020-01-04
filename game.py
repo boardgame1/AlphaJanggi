@@ -1,4 +1,4 @@
-import numpy
+import numpy, random
 import collections
 from typing import List, Optional
 
@@ -229,4 +229,4 @@ class ReplayBuffer(object):
 
   def sample_position(self, game) -> int:
     # Sample position from game either uniformly or according to some priority.
-    return numpy.random.choice(game.history)
+    return random.randrange(0, len(game.history))

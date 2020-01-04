@@ -2,7 +2,7 @@
 import numpy, argparse
 import torch
 import torch.optim as optim
-import copy
+import copy, time
 
 from model import Network
 from game import MuZeroConfig, ReplayBuffer, make_janggi_config, Node
@@ -13,7 +13,7 @@ from environ import Winner
 ################################################################################
 
 # Battle against random agents
-def vs_random(network, config, n=100):
+def vs_random(network, config, n=20):
     results = {}
     for i in range(n):
         first_turn = i % 2 == 0
@@ -40,6 +40,7 @@ def vs_random(network, config, n=100):
         elif ((game.environment.winner == Winner.black and first_turn)
             or (game.environment.winner == Winner.white and not first_turn)):
           r = -1
+        print(r)
         results[r] = results.get(r, 0) + 1
     return results
 
@@ -63,7 +64,7 @@ def random_vs_random(config, n=100):
         results[r] = results.get(r, 0) + 1
     return results
 
-def latest_vs_older(last, old, config, n=100):
+def latest_vs_older(last, old, config, n=20):
     results = {}
     for i in range(n):
         first_turn = i % 2 == 0
@@ -97,6 +98,7 @@ def latest_vs_older(last, old, config, n=100):
         elif ((game.environment.winner == Winner.black and first_turn)
             or (game.environment.winner == Winner.white and not first_turn)):
           r = -1
+        print(r)
         results[r] = results.get(r, 0) + 1
     return results
 
@@ -118,9 +120,10 @@ def muzero(config: MuZeroConfig, device):
 
   i = 0
   while True:
-      print(i)
+      t = time.time()
       game = play_game(config, network)
       replay_buffer.save_game(game)
+      print('%d steps/s %.2f'%(i, game.environment.turn/(time.time()-t)))
       i += 1
       if i % config.checkpoint_interval == 0:
           batch = replay_buffer.sample_batch(config.num_unroll_steps, config.td_steps)
