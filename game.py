@@ -158,9 +158,11 @@ class Game(object):
 
   def store_search_statistics(self, root: Node):
     sum_visits = sum(child.visit_count for child in root.children.values())
+    cv = []
     for a in root.children:
-      self.child_visits.append(root.children[a].visit_count / sum_visits)
-      self.child_visits.append(a)
+      cv.append(root.children[a].visit_count / sum_visits)
+      cv.append(a)
+    self.child_visits.append(cv)
     self.root_values.append(root.value())
 
   def make_image(self, state_index: int):
