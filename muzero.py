@@ -131,7 +131,7 @@ def muzero(config: MuZeroConfig, device):
           # Test against random agent
           vs_random_once = vs_random(network, config)
           print('network_vs_random = ', sorted(vs_random_once.items()), end='\n')
-          vs_older = latest_vs_older(network, oldnet, config)
+          vs_older = latest_vs_older(network, oldnet, config, 1)
           print('lastnet_vs_older = ', sorted(vs_older.items()), end='\n')
           oldnet = copy.deepcopy(network)
 
