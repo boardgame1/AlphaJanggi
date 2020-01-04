@@ -71,7 +71,7 @@ class Environment(object):
           self.board[y0][x0] = 0
 
           if captured % 10 == KING:
-              self.done = True;print(captured, self.turn)
+              self.done = True
               self.winner = Winner.black if captured<10 else Winner.white
 
       self.turn += 1

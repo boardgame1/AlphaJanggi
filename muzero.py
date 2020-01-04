@@ -118,9 +118,9 @@ def muzero(config: MuZeroConfig, device):
 
   i = 0
   while True:
+      print(i)
       game = play_game(config, network)
       replay_buffer.save_game(game)
-      print(len(replay_buffer.buffer))
       i += 1
       if i % config.checkpoint_interval == 0:
           batch = replay_buffer.sample_batch(config.num_unroll_steps, config.td_steps)
