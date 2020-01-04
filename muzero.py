@@ -1,5 +1,5 @@
 
-import numpy, sys
+import numpy, argparse
 import torch
 import torch.optim as optim
 import copy
@@ -168,11 +168,14 @@ def update_weights(batch, network, optimizer, device):
 ##################################
 
 if __name__ == "__main__":
-  device = 'cpu' #'cuda:0' if torch.cuda.is_available() else
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cuda", default=False, action="store_true", help="Enable CUDA")
+    args = parser.parse_args()
+    device = 'cuda:0' if args.cuda else 'cpu'
 
-  print(device)
+    print(device)
 
-  config = make_janggi_config()
-  vs_random_once = random_vs_random(config)
-  print('random_vs_random = ', sorted(vs_random_once.items()), end='\n')
-  network = muzero(config, device)
+    config = make_janggi_config()
+    vs_random_once = random_vs_random(config)
+    print('random_vs_random = ', sorted(vs_random_once.items()), end='\n')
+    network = muzero(config, device)
