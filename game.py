@@ -65,8 +65,8 @@ class MuZeroConfig(object):
     self.known_bounds = known_bounds
 
     ### Training
-    self.checkpoint_interval = int(100)
-    self.window_size = int(1e6)
+    self.checkpoint_interval = int(10)
+    self.window_size = int(10)
     self.batch_size = batch_size
     self.num_unroll_steps = 4
     self.td_steps = td_steps
