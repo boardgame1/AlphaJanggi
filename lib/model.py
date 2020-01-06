@@ -64,7 +64,7 @@ class Net(nn.Module):
         batch_size = x.size()[0]
         v = self.conv_in(x)
         for block in self.blocks:
-            v = v + block(v)
+            v = block(v)
         val = self.conv_val(v)
         val = self.value(val.view(batch_size, -1))
         pol = self.conv_policy(v)
