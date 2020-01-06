@@ -8,7 +8,7 @@ from lib import game, mcts
 
 
 OBS_SHAPE = (17, game.GAME_ROWS, game.GAME_COLS)
-NUM_FILTERS = 64
+NUM_FILTERS = 128
 policy_size = 185
 
 class Net(nn.Module):
@@ -64,7 +64,7 @@ class Net(nn.Module):
         batch_size = x.size()[0]
         v = self.conv_in(x)
         for block in self.blocks:
-            v = block(v)
+            v = v + block(v)
         val = self.conv_val(v)
         val = self.value(val.view(batch_size, -1))
         pol = self.conv_policy(v)
