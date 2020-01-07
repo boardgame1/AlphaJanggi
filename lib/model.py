@@ -23,7 +23,7 @@ class Net(nn.Module):
         res_block = nn.Sequential(
             nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
             nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.blocks = nn.ModuleList([res_block for _ in range(2)])
+        self.blocks = nn.ModuleList([res_block for _ in range(0)])
 
         body_out_shape = (NUM_FILTERS, ) + input_shape[1:]
 
@@ -64,7 +64,7 @@ class Net(nn.Module):
         batch_size = x.size()[0]
         v = self.conv_in(x)
         for block in self.blocks:
-            v = v + block(v)
+            v = block(v)
         val = self.conv_val(v)
         val = self.value(val.view(batch_size, -1))
         pol = self.conv_policy(v)
