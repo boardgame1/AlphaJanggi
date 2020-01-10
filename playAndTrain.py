@@ -14,7 +14,7 @@ import torch.multiprocessing as mp
 
 PLAY_EPISODES = 25
 MCTS_SEARCHES = 10
-MCTS_BATCH_SIZE = 80
+MCTS_BATCH_SIZE = 20
 REPLAY_BUFFER = 30000
 LEARNING_RATE = 0.1
 BATCH_SIZE = 256
@@ -190,7 +190,7 @@ if __name__ == "__main__":
         if step_idx % EVALUATE_EVERY_STEP == 0:
             net.eval()
             win_ratio = evaluate(num_proc, args.cuda, lock, net, best_net, rounds=EVALUATION_ROUNDS,
-                                 mcts_searches=20, mcts_batch_size=80, device=device)
+                                 mcts_searches=20, mcts_batch_size=20, device=device)
             print("Net evaluated, win ratio = %.2f" % win_ratio)
             if win_ratio > BEST_NET_WIN_RATIO:
                 print("Net is better than cur best, sync")
