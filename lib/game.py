@@ -175,10 +175,10 @@ def kingSafe(pan, player, arr):
             if(k==10-oplayer+KING): kingp=d*9+j; kingx = j; kingy = d
             elif(k>KING+oplayer and k<9+oplayer and k!=SA+oplayer): pcs.append([d*9+j, k%10])
     kings = []; kings.append(kingp)
-    for d in range(-1,2):
+    for d in range(-1,3,2):
         x=kingx+d
         if x>2 and x<6: kings.append(kingy*9+x)
-    for d in range(-1,2):
+    for d in range(-1,3,2):
         y=kingy+d
         if y>=0 and y<10 and (y<3 or y>6): kings.append(y*9+kingx)
     if gungd[kingp]:
