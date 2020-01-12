@@ -166,7 +166,9 @@ sangv=(
    0,  7,  0,  0,  0,  0,  0, 11,  0,
    0,  0, 17,  0,  0,  0, 19,  0,  0)
 
-def kingSafe(pan, player, arr):
+def kingSafe(pan, player, arr, altf=False):
+    revf = player<1
+    if altf: player = 1-player
     oplayer = (1-player)*10
     pcs = []
     for d in range(10):
@@ -195,14 +197,14 @@ def kingSafe(pan, player, arr):
                 if(x==kingx):
                     d=1 if y<kingy else -1; y+=d
                     while(y!=kingy and pan[y][x]==0): y+=d
-                    if(y==kingy): arr[y if player<1 else 9-y][x]=1
+                    if(y==kingy): arr[y if revf else 9-y][x]=1
                 elif(y==kingy):
                     d=1 if x<kingx else -1; x+=d
                     while(x!=kingx and pan[y][x]==0): x+=d
-                    if(x==kingx): arr[y if player<1 else 9-y][x]=1
+                    if(x==kingx): arr[y if revf else 9-y][x]=1
                 elif(gungd[p] and gungd[kingp] and abs(y-kingy)<4):
                     d=abs(x-kingx)
-                    if(d==1 or (d==2 and pan[1 if y<4 else 8][4]==0)): arr[y if player<1 else 9-y][x]=1
+                    if(d==1 or (d==2 and pan[1 if y<4 else 8][4]==0)): arr[y if revf else 9-y][x]=1
             elif piece[1] == PO:
                 if(x==kingx):
                     d=1 if y<kingy else -1; y+=d
@@ -210,23 +212,23 @@ def kingSafe(pan, player, arr):
                     if(y!=kingy and pan[y][x]%10!=PO):
                         y+=d
                         while(y!=kingy and pan[y][x]==0): y+=d
-                        if(y==kingy): arr[y if player<1 else 9-y][x]=1
+                        if(y==kingy): arr[y if revf else 9-y][x]=1
                 elif(y==kingy):
                     d=1 if x<kingx else -1; x+=d
                     while(x!=kingx and pan[y][x]==0): x+=d
                     if(x!=kingx and pan[y][x]%10!=PO):
                         x+=d
                         while(x!=kingx and pan[y][x]==0): x+=d
-                        if(x==kingx): arr[y if player<1 else 9-y][x]=1
+                        if(x==kingx): arr[y if revf else 9-y][x]=1
                 elif(gungd[p] and gungd[kingp] and abs(y-kingy)==2):
                     k=pan[1 if y<4 else 8][4]
-                    if(k%10!=PO and k>0): arr[y if player<1 else 9-y][x]=1
+                    if(k%10!=PO and k>0): arr[y if revf else 9-y][x]=1
             elif piece[1] == MA:
                 d=abs(x-kingx); k=abs(y-kingy)
                 if(d+k==3 and d>0 and d<3):
                     if(d==1): y+=-1 if kingy<y else 1
                     else: x+=-1 if kingx<x else 1
-                    if(pan[y][x]==0): arr[y if player<1 else 9-y][x]=1
+                    if(pan[y][x]==0): arr[y if revf else 9-y][x]=1
             elif piece[1] == SANG:
                 d=abs(x-kingx); k=abs(y-kingy)
                 if(d+k==5 and d>1 and d<4):
@@ -234,12 +236,12 @@ def kingSafe(pan, player, arr):
                     else: x+=-1 if kingx<x else 1
                     if(pan[y][x]==0):
                         k=sangv[kingp-p+31]+p
-                        if(pan[k//9][k%9]==0): arr[y if player<1 else 9-y][x]=1
+                        if(pan[k//9][k%9]==0): arr[y if revf else 9-y][x]=1
             elif piece[1] == ZOL:
                 if(y==kingy):
-                    if(abs(x-kingx)==1): arr[y if player<1 else 9-y][x]=1
+                    if(abs(x-kingx)==1): arr[y if revf else 9-y][x]=1
                 elif(kingy==y+(-1 if oplayer>0 else 1) and (x==kingx or (gungd[p] and gungd[kingp]))):
-                    arr[y if player<1 else 9-y][x]=1
+                    arr[y if revf else 9-y][x]=1
     return arr
 
 def move(pan_str, move, step):
