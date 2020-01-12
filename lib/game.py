@@ -7,7 +7,7 @@ PLAYER_HAN = 1
 KING=1; CHA=2; PO=3; MA=4; SANG=5; SA=6; ZOL=7
 maap=[[0,-1,-1,-2], [0,-1,1,-2], [1,0,2,-1], [1,0,2,1], [0,1,1,2], [0,1,-1,2], [-1,0,-2,-1], [-1,0,-2,1]]
 sangap=[[0,-1,-1,-2,-2,-3], [0,-1,1,-2,2,-3], [1,0,2,-1,3,-2], [1,0,2,1,3,2],
-	[0,1,1,2,2,3], [0,1,-1,2,-2,3], [-1,0,-2,1,-3,2], [-1,0,-2,-1,-3,-2]]
+    [0,1,1,2,2,3], [0,1,-1,2,-2,3], [-1,0,-2,1,-3,2], [-1,0,-2,-1,-3,-2]]
 INITIAL_STATE = ((2,0,0,6,0,6,0,0,2),(0,0,0,0,1,0,0,0,0),(0,3,0,0,0,0,0,3,0),(7,0,7,0,7,0,7,0,7),
     (0,0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0,0),(17,0,17,0,17,0,17,0,17),(0,13,0,0,0,0,0,13,0),
     (0,0,0,0,11,0,0,0,0),(12,0,0,16,0,16,0,0,12))
@@ -145,6 +145,94 @@ def possible_moves(pan_str, player, step):
                             if(a==0 or a//10!=alk): moven.append((y*9+x)*100+(k+1)*9+4)
         moven.append(0)
     return moven
+
+gungd = (
+  0, 0, 0, 1, 0, 1, 0, 0, 0,
+  0, 0, 0, 0, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 0, 1, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 1, 0, 1, 0, 0, 0,
+  0, 0, 0, 0, 1, 0, 0, 0, 0,
+  0, 0, 0, 1, 0, 1, 0, 0, 0)
+sangv=(
+   0,  0,-19,  0,  0,  0,-17,  0,  0,
+   0,-11,  0,  0,  0,  0,  0, -7,  0,
+   0,  0,  0,  0,  0,  0,  0,  0,  0,
+   0,  0,  0,  0,  0,  0,  0,  0,  0,
+   0,  0,  0,  0,  0,  0,  0,  0,  0,
+   0,  7,  0,  0,  0,  0,  0, 11,  0,
+   0,  0, 17,  0,  0,  0, 19,  0,  0)
+
+def kingSafe(pan, player, arr):
+    oplayer = (1-player)*10
+    pcs = []
+    for d in range(10):
+        for j in range(9):
+            k=pan[d][j]
+            if(k==10-oplayer+KING): kingp=d*9+j; kingx = j; kingy = d
+            elif(k>KING+oplayer and k<9+oplayer and k!=SA+oplayer): pcs.append([d*9+j, k%10])
+    kings = []; kings.append(kingp)
+    for d in range(-1,2):
+        for j in range(-1,2):
+            x=kingx+j; y=kingy+d
+            if (d!=0 or j!=0) and x>2 and x<6 and y>=0 and y<10 and (y<3 or y>6): kings.append(y*9+x)
+    for kingp in kings:
+        kingx = kingp%9; kingy = kingp//9
+        for piece in pcs:
+            p=piece[0]; x=p%9; y=p//9
+            if piece[1] == CHA:
+                if(x==kingx):
+                    d=1 if y<kingy else -1; y+=d
+                    while(y!=kingy and pan[y][x]==0): y+=d
+                    if(y==kingy): arr[y][x]=1
+                elif(y==kingy):
+                    d=1 if x<kingx else -1; x+=d
+                    while(x!=kingx and pan[y][x]==0): x+=d
+                    if(x==kingx): arr[y][x]=1
+                elif(gungd[p] and gungd[kingp] and abs(y-kingy)<4):
+                    d=abs(x-kingx)
+                    if(d==1 or (d==2 and pan[1 if y<4 else 8][4]==0)): arr[y][x]=1
+            elif piece[1] == PO:
+                if(x==kingx):
+                    d=1 if y<kingy else -1; y+=d
+                    while(y!=kingy and pan[y][x]==0): y+=d
+                    if(y!=kingy and pan[y][x]%10!=PO):
+                        y+=d
+                        while(y!=kingy and pan[y][x]==0): y+=d
+                        if(y==kingy): arr[y][x]=1
+                elif(y==kingy):
+                    d=1 if x<kingx else -1; x+=d
+                    while(x!=kingx and pan[y][x]==0): x+=d
+                    if(x!=kingx and pan[y][x]%10!=PO):
+                        x+=d
+                        while(x!=kingx and pan[y][x]==0): x+=d
+                        if(x==kingx): arr[y][x]=1
+                elif(gungd[p] and gungd[kingp] and abs(y-kingy)==2):
+                    k=pan[1 if y<4 else 8][4]
+                    if(k%10!=PO and k>0): arr[y][x]=1
+            elif piece[1] == MA:
+                d=abs(x-kingx); k=abs(y-kingy)
+                if(d+k==3 and d>0 and d<3):
+                    if(d==1): y+=-1 if kingy<y else 1
+                    else: x+=-1 if kingx<x else 1
+                    if(pan[y][x]==0): arr[y][x]=1
+            elif piece[1] == SANG:
+                d=abs(x-kingx); k=abs(y-kingy)
+                if(d+k==5 and d>1 and d<4):
+                    if(d==2): y+=-1 if kingy<y else 1
+                    else: x+=-1 if kingx<x else 1
+                    if(pan[y][x]==0):
+                        k=sangv[kingp-p+31]+p
+                        if(pan[k//9][k%9]==0): arr[y][x]=1
+            elif piece[1] == ZOL:
+                if(y==kingy):
+                    if(abs(x-kingx)==1): arr[y][x]=1
+                elif(kingy==y+(-1 if oplayer>0 else 1) and (x==kingx or (gungd[p] and gungd[kingp]))):
+                    arr[y][x]=1
+    return arr
 
 def move(pan_str, move, step):
     pan = decode_binary(pan_str)
