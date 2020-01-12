@@ -176,9 +176,17 @@ def kingSafe(pan, player, arr):
             elif(k>KING+oplayer and k<9+oplayer and k!=SA+oplayer): pcs.append([d*9+j, k%10])
     kings = []; kings.append(kingp)
     for d in range(-1,2):
-        for j in range(-1,2):
-            x=kingx+j; y=kingy+d
-            if (d!=0 or j!=0) and x>2 and x<6 and y>=0 and y<10 and (y<3 or y>6): kings.append(y*9+x)
+        x=kingx+d
+        if x>2 and x<6: kings.append(kingy*9+x)
+    for d in range(-1,2):
+        y=kingy+d
+        if y>=0 and y<10 and (y<3 or y>6): kings.append(y*9+kingx)
+    if gungd[kingp]:
+        for d in range(-1, 3, 2):
+            for j in range(-1,3, 2):
+                x=kingx+j; y=kingy+d
+                if x>2 and x<6 and ((kingy<3 and y>=0 and y<3) or (kingy>2 and y>6 and y<10)):
+                    kings.append(y*9+x)
     for kingp in kings:
         kingx = kingp%9; kingy = kingp//9
         for piece in pcs:
