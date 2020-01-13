@@ -24,7 +24,7 @@ class Net(nn.Module):
             nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
             nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
 
-        self.blocks = nn.ModuleList([res_block for _ in range(5)])
+        self.blocks = nn.ModuleList([res_block for _ in range(3)])
 
         body_out_shape = (NUM_FILTERS, ) + input_shape[1:]
 
@@ -88,7 +88,7 @@ def _encode_list_state(dest_np, state_list, step):
         for col_idx, cell in enumerate(row):
             if cell>0:
                 dest_np[cell%10-1+(cell//10 if who_move<1 else 1-cell//10)*7, ridx, col_idx] = 1.0
-    game.kingSafe(state_list, who_move, dest_np[15])
+    #game.kingSafe(state_list, who_move, dest_np[15])
     #game.kingSafe(state_list, who_move, dest_np[16], True)
     ci=8
     while step>0:
