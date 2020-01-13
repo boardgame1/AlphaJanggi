@@ -89,7 +89,7 @@ def _encode_list_state(dest_np, state_list, step):
             if cell>0:
                 dest_np[cell%10-1+(cell//10 if who_move<1 else 1-cell//10)*7, ridx, col_idx] = 1.0
     game.kingSafe(state_list, who_move, dest_np[15])
-    game.kingSafe(state_list, who_move, dest_np[16], True)
+    #game.kingSafe(state_list, who_move, dest_np[16], True)
     ci=8
     while step>0:
         if step%2>0: dest_np[14, 0, ci] = 1.0
