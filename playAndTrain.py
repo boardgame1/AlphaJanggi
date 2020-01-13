@@ -151,9 +151,8 @@ if __name__ == "__main__":
         game_nodes = len(mcts_store)# - prev_nodes
         dt = time.time() - t
         speed_steps = game_steps / dt
-        speed_nodes = game_nodes / dt
-        print("Step %d, steps %3d, leaves %4d, steps/s %5.2f, leaves/s %6.2f, best_idx %d, replay %d" % (
-            step_idx, game_steps, game_nodes, speed_steps, speed_nodes, best_idx, len(replay_buffer)))
+        print("Step %d, steps %3d, leaves %4d, steps/s %5.2f, dt %6.2f, best_idx %d, replay %d" % (
+            step_idx, game_steps, game_nodes, speed_steps, dt, best_idx, len(replay_buffer)))
         step_idx += 1
 
         if len(replay_buffer) < MIN_REPLAY_TO_TRAIN:
