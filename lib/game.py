@@ -244,6 +244,8 @@ def kingSafe(pan, player, arr, altf=False):
                     arr[y if revf else 9-y][x]=1
     return arr
 
+pieceScore = [13,7,5,3,3,2]
+
 def move(pan_str, move, step):
     pan = decode_binary(pan_str)
     if(move>=10000):
@@ -275,4 +277,11 @@ def move(pan_str, move, step):
         pan[y1][x1] = piece
         pan[y0][x0] = 0
 
-        return encode_lists(pan, step+1), True if captured%10 == KING else False
+        pscore = [0, 1.5]
+        for y in range(10):
+            for x in range(9):
+                ki = pan[y][x]
+                if (ki % 10 > 1): pscore[ki // 10] += pieceScore[ki % 10 - 2]
+
+        return encode_lists(pan, step+1), True if captured%10 == KING or\
+            ((pscore[0]<=10 or pscore[1]<=10) and pscore[step%2]>pscore[1-step%2]) else False
