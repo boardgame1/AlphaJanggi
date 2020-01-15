@@ -279,11 +279,4 @@ def move(pan_str, move, step):
         pan[y1][x1] = piece
         pan[y0][x0] = 0
 
-        pscore = [0, 1.5]
-        for y in range(10):
-            for x in range(9):
-                ki = pan[y][x]
-                if (ki % 10 > 1): pscore[ki // 10] += pieceScore[ki % 10 - 2]
-
-        return encode_lists(pan, step+1), True if captured%10 == KING or\
-            ((pscore[0]<=10 or pscore[1]<=10) and pscore[step%2]>pscore[1-step%2]) else False
+        return encode_lists(pan, step+1), True if captured%10 == KING else False
