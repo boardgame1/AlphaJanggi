@@ -31,6 +31,7 @@ def decode_binary(state_str):
 def possible_moves(pan_str, player, step):
     pan = decode_binary(pan_str)
     moven = []
+    okingp = 0
     if step<2:
         for i in range(4): moven.append(10000+i)
     else:
@@ -143,8 +144,9 @@ def possible_moves(pan_str, player, step):
                         if((x==3 or x==5) and (y==2 or y==7)):
                             a=pan[k+1][4]
                             if(a==0 or a//10!=alk): moven.append((y*9+x)*100+(k+1)*9+4)
+                elif ki%10 == KING: okingp = y*9+x
         moven.append(0)
-    return moven
+    return moven, okingp
 
 gungd = (
   0, 0, 0, 1, 0, 1, 0, 0, 0,

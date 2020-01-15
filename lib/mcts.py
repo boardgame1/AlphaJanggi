@@ -66,7 +66,7 @@ class MCTS:
             probs = self.probs[cur_state]
             values_avg = self.value_avg[cur_state]
 
-            movel = game.possible_moves(cur_state, cur_player, step)
+            movel, okingp = game.possible_moves(cur_state, cur_player, step)
             # choose action to take, in the root node add the Dirichlet noise to the probs
             alen = len(actions)
             if alen<1:
@@ -79,6 +79,7 @@ class MCTS:
                             0.75 * probs[idx] + 0.25 * noises[i])* total_sqrt / (1 + counts[idx])
                 else:
                     ma = hanAction(m) if cur_player > 0 else m
+                    if m%100 == okingp: action = m; mam = ma; break
                     idx = ma//100; idx2 = ma%100+95
                     score = values_avg[idx] + values_avg[idx2] + self.c_puct * (probs[idx]+probs[idx2]
                         if alen else 0.75 * probs[idx]+probs[idx2] + 0.25 * noises[i])* total_sqrt /\
