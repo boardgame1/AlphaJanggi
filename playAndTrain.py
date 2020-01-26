@@ -99,7 +99,7 @@ if __name__ == "__main__":
     best_idx = 0
     net = model.Net(input_shape=model.OBS_SHAPE, actions_n=model.policy_size).to(device)
     #print(net)
-    if args.model: modelfile = args.model
+    """if args.model: modelfile = args.model
     else:
         modelfile = './model.pth'
         webFunction.download_file('https://alphajanggi.net/modeldownload2', modelfile)
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     checkpoint = torch.load(modelfile, map_location=lambda storage, loc: storage)
     net.load_state_dict(checkpoint['model'], strict=False)
     best_idx = checkpoint['best_idx']
-    print("model loaded", modelfile, best_idx)
+    print("model loaded", modelfile, best_idx)"""
 
     best_net = copy.deepcopy(net)
     best_net.eval(); net.train()
@@ -198,9 +198,9 @@ if __name__ == "__main__":
                 file_name = os.path.join(saves_path, "best_%d.pth" % (best_idx))
                 torch.save({'model': net.state_dict(), 'best_idx': best_idx}, file_name)
 
-                a1 = file_name.rfind('\\')
+                """a1 = file_name.rfind('\\')
                 a2 = file_name.rfind('/')
                 if a2 > a1: a1 = a2
                 webFunction.upload_file('https://alphajanggi.net/fileupload2', path=file_name,
-                                        filename=file_name[(a1 if a1 > 0 else 0):])
+                                        filename=file_name[(a1 if a1 > 0 else 0):])"""
             net.train()
