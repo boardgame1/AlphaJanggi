@@ -87,14 +87,11 @@ class MCTS:
                 if score>max_score: max_score=score; action = m; mam = ma
             actions.append(mam)
             cur_state, won = game.move(cur_state, action, step)
-            if won:
+            if won>0:
                 # if somebody won the game, the value of the final state is -1 (as it is on opponent's turn)
-                value = -1.0
+                value = -1.0 if won - 1 == cur_player else 1.0
             cur_player = 1-cur_player
             step += 1
-            # check for the draw
-            if value is None and step >= game.MAX_TURN:
-                value = 0.0
 
         if value != None: value *= 1-(game.MAX_TURN-step)/1000
 

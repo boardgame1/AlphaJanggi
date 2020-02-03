@@ -1,13 +1,13 @@
-import collections
+import collections, json, sys
 import numpy as np
 
 import torch
 import torch.nn as nn
 
-from lib import game, mcts
+from lib import game, mcts, webFunction
 
 
-NUM_FILTERS = 192
+NUM_FILTERS = 128
 OBS_SHAPE = (17, game.GAME_ROWS, game.GAME_COLS)
 policy_size = 185
 
@@ -24,7 +24,7 @@ class Net(nn.Module):
             nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
             nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
 
-        self.blocks = nn.ModuleList([res_block for _ in range(1)])
+        self.blocks = nn.ModuleList([res_block for _ in range(3)])
 
         body_out_shape = (NUM_FILTERS, ) + input_shape[1:]
 
@@ -88,8 +88,6 @@ def _encode_list_state(dest_np, state_list, step):
         for col_idx, cell in enumerate(row):
             if cell>0:
                 dest_np[cell%10-1+(cell//10 if who_move<1 else 1-cell//10)*7, ridx, col_idx] = 1.0
-    #game.kingSafe(state_list, who_move, dest_np[15])
-    #game.kingSafe(state_list, who_move, dest_np[16], True)
     ci=8
     while step>0:
         if step%2>0: dest_np[14, 0, ci] = 1.0
@@ -112,7 +110,7 @@ def state_lists_to_batch(state_lists, steps_lists, device="cpu"):
 
 
 def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_searches, mcts_batch_size,
-              device="cpu"):
+              best_idx, domain=None, username=None, device="cpu"):
     """
     Play one single game, memorizing transitions into the replay buffer
     :param mcts_stores: could be None or single MCTS or two MCTSes for individual net
@@ -150,22 +148,17 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
                                              cur_player, nets[cur_player], step, device=device)
         movel, _ = game.possible_moves(state, cur_player, step)
         probs, _, movep = mcts_stores[cur_player].get_policy_value(state, movel, cur_player, tau=tau)
-        game_history.append((state, step, probs))
         action = movel[np.random.choice(len(movel), p=movep)]
+        game_history.append((action, probs) if queue is None else (state, step, probs))
         if action not in movel:
             print("Impossible action selected")
         state, won = game.move(state, action, step)
         if step%3<1: print('.', end='', flush=True)
-        if won:
-            net1_result = 1 if cur_player == 0 else -1
+        if won>0:
+            net1_result = 1 if won == 1 else -1
             result = -net1_result
             break
         step += 1
-        # check the draw case
-        if step>=game.MAX_TURN:
-            net1_result = 0
-            result = 0
-            break
         cur_player = 1-cur_player
         if step >= steps_before_tau_0:
             tau = 0
@@ -178,5 +171,16 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
                 queue.append((state, hstep, probs, result)) if dequeuef else\
                     queue.put((state, hstep, probs, result))
                 if hstep!=1: result = -result
+        elif best_idx>=0:
+            gh = []
+            for (action, probs) in game_history:
+                prar = []
+                for idx, prob in enumerate(probs):
+                    if prob>0: prar.append([idx, prob])
+                gh.append((action, prar))
+            js = {"netIdx":best_idx, "result":net1_result, "username":username, "action":gh}
+            hr = webFunction.http_request(domain+"/selfplay4", True, json.dumps(js))
+            if hr == None: sys.exit()
+            print("game is uploaded")
 
     return net1_result, step if net1_result!=None else 0
