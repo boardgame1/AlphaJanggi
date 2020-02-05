@@ -3,7 +3,7 @@ import os, sys, getpass
 import time
 import argparse, json
 
-from lib import model, mcts, webFunction
+from lib import model, mcts, webFunction, game
 
 import torch
 
@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     while True:
         t = time.time()
-        _, game_steps = model.play_game(None, mcts_store, None, net, net, steps_before_tau_0=STEPS_BEFORE_TAU_0,
+        _, game_steps = model.play_game(None, mcts_store, None, net, net, steps_before_tau_0=game.MAX_TURN,
                 mcts_searches=MCTS_SEARCHES, mcts_batch_size=MCTS_BATCH_SIZE, best_idx=best_idx,
                                    domain=domain, username=username, device=device)
         game_nodes = len(mcts_store)

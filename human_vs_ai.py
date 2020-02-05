@@ -92,7 +92,7 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
             break
         cur_player = 1-cur_player
         step += 1
-        if step >= steps_before_tau_0:
+        if step >= game.MAX_TURN:
             tau = 0
 
 if __name__ == "__main__":

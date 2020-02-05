@@ -3,7 +3,7 @@ import sys
 import time
 import argparse
 
-from lib import model
+from lib import model, game
 
 import torch
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
             wins, losses, draws = 0, 0, 0
             ts = time.time()
             for _ in range(args.rounds):
-                r, _ = model.play_game(None, None, queue=None, net1=n1[1], net2=n2[1], steps_before_tau_0=0,
+                r, _ = model.play_game(None, None, queue=None, net1=n1[1], net2=n2[1], steps_before_tau_0=game.MAX_TURN,
                                     mcts_searches=MCTS_SEARCHES, mcts_batch_size=MCTS_BATCH_SIZE, device=device)
                 print(r)
                 if r > 0.5:
