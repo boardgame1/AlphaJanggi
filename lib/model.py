@@ -24,7 +24,7 @@ class Net(nn.Module):
             nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
             nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
 
-        self.blocks = nn.ModuleList([res_block for _ in range(3)])
+        self.blocks = nn.ModuleList([res_block for _ in range(4)])
 
         body_out_shape = (NUM_FILTERS, ) + input_shape[1:]
 
