@@ -21,6 +21,7 @@ def render(pan_str, player_human):
             print("  │  │  │  │＼│／│  │  │  │ " if y<1 or y==7 else "  │  │  │  │／│＼│  │  │  │ "\
                 if y==1 or y>7 else "  │  │  │  │  │  │  │  │  │ ")
 
+masang = ['마상마상','상마상마','마상상마', '상마마상']
 def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="cpu"):
     assert isinstance(net1, model.Net)
     assert isinstance(steps_before_tau_0, int) and steps_before_tau_0 >= 0
@@ -44,7 +45,7 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
         movelist, _ = game.possible_moves(pan, cur_player, step)
         if (step<2 and cur_player != player_human) or (step>1 and cur_player == player_human):
             if step < 2:
-                print("마상 차림을 선택하세요 0) 마상마상, 1) 상마상마, 2) 마상상마, 3) 상마마상")
+                print("마상 차림을 선택하세요 0) "+masang[0]+", 1) "+masang[1]+", 2) "+masang[2]+", 3) "+masang[3])
             else:
                 render(pan, player_human)
                 if step==2 or step==3:
@@ -72,7 +73,7 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
                             cur_player, net1, step, device=device)
             probs, _, movep = mctsi.get_policy_value(pan, movelist, cur_player, tau=tau)
             action = movelist[np.random.choice(len(movelist), p=movep)]
-            if step<1: print('한: '+('마상마상' if action<10001 else '상마상마' if action<10002 else '마상상마' if action<10003 else '상마마상'))
+            if step<1: print('한: '+masang[action-10000])
             elif step>1:
                 if action<1: print('한수쉼')
                 else:

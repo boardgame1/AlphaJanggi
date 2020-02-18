@@ -56,6 +56,7 @@ if __name__ == "__main__":
     if mhash >=0: s += "?mhash="+str(mhash)
     hr = webFunction.http_request(s)
     if hr == None: sys.exit()
+    model.resBlockNum = hr['resBlock']
     if hr["status"] == "download":
         webFunction.download_file(domain+hr["url"], modelfile)
         df = open(dfile, "w")
