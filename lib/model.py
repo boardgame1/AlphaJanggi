@@ -10,6 +10,7 @@ from lib import game, mcts, webFunction
 NUM_FILTERS = 128
 OBS_SHAPE = (17, game.GAME_ROWS, game.GAME_COLS)
 policy_size = 185
+resBlockNum = 4
 
 class Net(nn.Module):
     def __init__(self, input_shape, actions_n):
@@ -24,7 +25,7 @@ class Net(nn.Module):
             nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
             nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
 
-        self.blocks = nn.ModuleList([res_block for _ in range(4)])
+        self.blocks = nn.ModuleList([res_block for _ in range(resBlockNum)])
 
         body_out_shape = (NUM_FILTERS, ) + input_shape[1:]
 
