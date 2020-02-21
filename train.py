@@ -49,18 +49,19 @@ if __name__ == "__main__":
     saves_path = "saves"
     os.makedirs(saves_path, exist_ok=True)
 
-    net = model.Net(input_shape=model.OBS_SHAPE, actions_n=model.policy_size).to(device)
-    optimizer = optim.SGD(net.parameters(), lr=LEARNING_RATE, momentum=0.9)
     step_idx = 0
     best_idx = 1
 
-    if args.model:
-        checkpoint = torch.load(args.model, map_location=lambda storage, loc: storage)
-        net.load_state_dict(checkpoint['model'], strict=False)
-        best_idx = checkpoint['best_idx']
-        print("model loaded", args.model)
+    checkpoint = torch.load(args.model, map_location=lambda storage, loc: storage)
+    model.resBlockNum = checkpoint['resBlockNum']
+    net = model.Net(input_shape=model.OBS_SHAPE, actions_n=model.policy_size).to(device)
+    net.load_state_dict(checkpoint['model'], strict=False)
+    best_idx = checkpoint['best_idx']
+    print("model loaded", args.model)
+
     best_net = copy.deepcopy(net)
     best_net.eval()
+    optimizer = optim.SGD(net.parameters(), lr=LEARNING_RATE, momentum=0.9)
     print('best_idx: '+str(best_idx))
 
     replay_buffer = collections.deque(maxlen=REPLAY_BUFFER)
@@ -123,5 +124,5 @@ if __name__ == "__main__":
         best_net.load_state_dict(net.state_dict())
         best_idx += 1
         file_name = os.path.join(saves_path, "best_%d.pth" % (best_idx))
-        torch.save({'model': net.state_dict(), 'best_idx': best_idx}, file_name)
+        torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': model.resBlockNum}, file_name)
 

@@ -22,8 +22,10 @@ if __name__ == "__main__":
 
     nets = []
     for fname in args.models:
-        net = model.Net(model.OBS_SHAPE, actions_n=model.policy_size)
         checkpoint = torch.load(fname, map_location=lambda storage, loc: storage)
+        if 'resBlockNum' in checkpoint and model.resBlockNum < checkpoint['resBlockNum']:
+            model.resBlockNum = checkpoint['resBlockNum']
+        net = model.Net(model.OBS_SHAPE, actions_n=model.policy_size)
         net.load_state_dict(checkpoint['model'], strict=False)
         net = net.to(device)
         nets.append((fname, net))

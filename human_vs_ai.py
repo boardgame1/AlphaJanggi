@@ -106,8 +106,10 @@ if __name__ == "__main__":
 
     modelfile = args.model if args.model else "./best_model.pth"
     if os.path.isfile(modelfile):
-        net = model.Net(model.OBS_SHAPE, model.policy_size).to(device)
         checkpoint = torch.load(modelfile, map_location=lambda storage, loc: storage)
+        if 'resBlockNum' in checkpoint:
+            model.resBlockNum = checkpoint['resBlockNum']
+        net = model.Net(model.OBS_SHAPE, model.policy_size).to(device)
         net.load_state_dict(checkpoint['model'], strict=False)
         net.eval()
 
