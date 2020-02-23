@@ -42,6 +42,7 @@ def evaluate(net1, net2, rounds, device="cpu"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--cuda", default=False, action="store_true", help="Enable CUDA")
+    parser.add_argument("--inc", default=False, action="store_true", help="Increase resBlockNum")
     parser.add_argument("-m", "--model", help="Model to load")
     args = parser.parse_args()
     device = torch.device("cuda" if args.cuda else "cpu")
@@ -53,7 +54,8 @@ if __name__ == "__main__":
     best_idx = 1
 
     checkpoint = torch.load(args.model, map_location=lambda storage, loc: storage)
-    model.resBlockNum = checkpoint['resBlockNum']
+    if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
+    if args.inc: model.resBlockNum +=1
     net = model.Net(input_shape=model.OBS_SHAPE, actions_n=model.policy_size).to(device)
     net.load_state_dict(checkpoint['model'], strict=False)
     best_idx = checkpoint['best_idx']
