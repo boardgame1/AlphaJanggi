@@ -34,7 +34,7 @@ if __name__ == "__main__":
             password = getpass.getpass("password: ")
             if password == "": continue
         js = {"username":username, "password":password, "createf":createf}
-        hr = webFunction.http_request(domain+"/user5", True, json.dumps(js))
+        hr = webFunction.http_request(domain+"/user6", True, json.dumps(js))
         if hr == None:
             print("문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.")
             sys.exit()
@@ -64,13 +64,14 @@ if __name__ == "__main__":
         df.write(s)
         df.close()
 
-    net = model.Net(input_shape=model.OBS_SHAPE, actions_n=model.policy_size).to(device)
     step_idx = 0
 
     checkpoint = torch.load(modelfile, map_location=lambda storage, loc: storage);
     if(checkpoint['best_idx'] != best_idx):
         print("wrong model file")
         sys.exit()
+    if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
+    net = model.Net(input_shape=model.OBS_SHAPE, actions_n=model.policy_size).to(device)
     net.load_state_dict(checkpoint['model'], strict=False)
     net.eval()
 
