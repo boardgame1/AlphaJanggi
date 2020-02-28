@@ -64,7 +64,7 @@ if __name__ == "__main__":
     best_net = copy.deepcopy(net)
     best_net.eval()
     optimizer = optim.SGD(net.parameters(), lr=LEARNING_RATE, momentum=0.9)
-    print('best_idx: '+str(best_idx))
+    print('best_idx: '+str(best_idx)+'  resBlockNum: '+str(model.resBlockNum))
 
     replay_buffer = collections.deque(maxlen=REPLAY_BUFFER)
     f = open("./train.dat", "r")
