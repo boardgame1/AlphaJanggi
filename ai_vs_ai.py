@@ -41,7 +41,7 @@ if __name__ == "__main__":
             ts = time.time()
             for _ in range(args.rounds):
                 r, _ = model.play_game(None, None, queue=None, net1=n1[1], net2=n2[1], steps_before_tau_0=game.MAX_TURN,
-                                    mcts_searches=MCTS_SEARCHES, mcts_batch_size=MCTS_BATCH_SIZE, device=device)
+                                    mcts_searches=MCTS_SEARCHES, mcts_batch_size=MCTS_BATCH_SIZE, best_idx=-1, device=device)
                 print(r)
                 if r > 0.5:
                     wins += 1
