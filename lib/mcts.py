@@ -17,18 +17,11 @@ def hanAction(m):
     return a * 100 + b
 
 class MCTS:
-    """
-    Class keeps statistics for every state encountered during the search
-    """
     def __init__(self, c_puct=1.0):
         self.c_puct = c_puct
-        # count of visits, state_int -> [N(s, a)]
         self.visit_count = {}
-        # total value of the state's action, state_int -> [W(s, a)]
         self.value = {}
-        # average value of actions, state_int -> [Q(s, a)]
         self.value_avg = {}
-        # prior probability of actions, state_int -> [P(s,a)]
         self.probs = {}
 
     def clear(self):
@@ -41,17 +34,6 @@ class MCTS:
         return len(self.value)
 
     def find_leaf(self, state_int, player, step):
-        """
-        Traverse the tree until the end of game or leaf node
-        :param state_int: root node state
-        :param player: player to move
-        :return: tuple of (value, leaf_state, player, states, actions)
-        1. value: None if leaf node, otherwise equals to the game outcome for the player at leaf
-        2. leaf_state: state_int of the last state
-        3. player: player at the leaf node
-        4. states: list of states traversed
-        5. list of actions taken
-        """
         states = []
         actions = []
         cur_state = state_int
@@ -105,9 +87,6 @@ class MCTS:
             self.search_minibatch(batch_size, state_int, player, net, step, device)
 
     def search_minibatch(self, count, state_int, player, net, step, device="cpu"):
-        """
-        Perform several MCTS searches.
-        """
         backup_queue = []
         expand_states = []
         expand_steps = []
@@ -125,7 +104,6 @@ class MCTS:
                     expand_steps.append(leaf_step)
                     expand_queue.append((leaf_state, states, actions))
 
-        # do expansion of nodes
         if expand_queue:
             batch_v = model.state_lists_to_batch(expand_states, expand_steps, device)
             logits_v, values_v = net(batch_v)
@@ -133,7 +111,6 @@ class MCTS:
             values = values_v.data.cpu().numpy()[:, 0]
             probs = probs_v.data.cpu().numpy()
 
-            # create the nodes
             for (leaf_state, states, actions), value, prob in zip(expand_queue, values, probs):
                 self.visit_count[leaf_state] = [0] * model.policy_size
                 self.value[leaf_state] = [0.0] * model.policy_size
@@ -141,9 +118,7 @@ class MCTS:
                 self.probs[leaf_state] = prob
                 backup_queue.append((value, states, actions))
 
-        # perform backup of the searches
         for value, states, actions in backup_queue:
-            # leaf state is not stored in states and actions, so the value of the leaf will be the value of the opponent
             cur_value = -value
             for state_int, action in zip(states[::-1], actions[::-1]):
                 for i in range(2):
@@ -157,11 +132,6 @@ class MCTS:
                 cur_value = -cur_value
 
     def get_policy_value(self, state_int, movel, cur_player, tau=1):
-        """
-        Extract policy and action-values by the state
-        :param state_int: state of the board
-        :return: (probs, values)
-        """
         counts = self.visit_count[state_int]
         movep = []
         for m in movel:

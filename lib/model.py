@@ -20,7 +20,6 @@ class Net(nn.Module):
             nn.Conv2d(input_shape[0], NUM_FILTERS, kernel_size=3, padding=1),
             nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
 
-        # layers with residual
         res_block = nn.Sequential(
             nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
             nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
@@ -29,7 +28,6 @@ class Net(nn.Module):
 
         body_out_shape = (NUM_FILTERS, ) + input_shape[1:]
 
-        # value head
         self.conv_val = nn.Sequential(
             nn.Conv2d(NUM_FILTERS, 1, kernel_size=1),
             nn.BatchNorm2d(1),
@@ -43,7 +41,6 @@ class Net(nn.Module):
             nn.Tanh()
         )
 
-        # policy head
         self.conv_policy = nn.Sequential(
             nn.Conv2d(NUM_FILTERS, 32, kernel_size=1),
             nn.BatchNorm2d(32),
@@ -75,12 +72,6 @@ class Net(nn.Module):
 
 
 def _encode_list_state(dest_np, state_list, step):
-    """
-    In-place encodes list state into the zero numpy array
-    :param dest_np: dest array, expected to be zero
-    :param state_list: state of the game in the list form
-    :param who_move: player index (game.PLAYER_WHITE or game.PLAYER_BLACK) who to move
-    """
     assert dest_np.shape == OBS_SHAPE
 
     who_move = step %2
@@ -96,12 +87,6 @@ def _encode_list_state(dest_np, state_list, step):
         ci -= 1
 
 def state_lists_to_batch(state_lists, steps_lists, device="cpu"):
-    """
-    Convert list of list states to batch for network
-    :param state_lists: list of 'list states'
-    :param who_moves_lists: list of player index who moves
-    :return Variable with observations
-    """
     assert isinstance(state_lists, list)
     batch_size = len(state_lists)
     batch = np.zeros((batch_size,) + OBS_SHAPE, dtype=np.float32)
@@ -112,14 +97,6 @@ def state_lists_to_batch(state_lists, steps_lists, device="cpu"):
 
 def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_searches, mcts_batch_size,
               best_idx, domain=None, username=None, device="cpu"):
-    """
-    Play one single game, memorizing transitions into the replay buffer
-    :param mcts_stores: could be None or single MCTS or two MCTSes for individual net
-    :param replay_buffer: queue with (state, probs, values), if None, nothing is stored
-    :param net1: player1
-    :param net2: player2
-    :return: value for the game in respect to player1 (+1 if p1 won, -1 if lost, 0 if draw)
-    """
     assert isinstance(mcts_stores, (mcts.MCTS, type(None), list))
     assert isinstance(net1, Net)
     assert isinstance(net2, Net)
