@@ -26,7 +26,7 @@ def http_request(url, post=False, data=None):
     for i in range(3):
         try:
             if post:
-                r = requests.post(url, data=data)
+                r = requests.post(url, data=data, timeout=10)
             else:
                 r = requests.get(url)
             if r.status_code != 200:
