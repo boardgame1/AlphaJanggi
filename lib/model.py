@@ -159,6 +159,7 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
             js = {"netIdx":best_idx, "result":net1_result, "username":username, "action":gh}
             hr = webFunction.http_request(domain+"/selfplay6", True, json.dumps(js))
             if hr == None: sys.exit()
-            print("game is uploaded")
+            elif hr['status'] == 'error': print('error occured')
+            else: print("game is uploaded")
 
     return net1_result, step if net1_result!=None else 0
