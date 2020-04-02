@@ -4,13 +4,12 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from lib import game, mcts, webFunction
+from lib import game, mcts, webFunction, actionTable
 
 
 NUM_FILTERS = 128
 OBS_SHAPE = (17, game.GAME_ROWS, game.GAME_COLS)
-policy_size = 185
-resBlockNum = 4
+resBlockNum = 1
 
 class Net(nn.Module):
     def __init__(self, input_shape, actions_n):
@@ -125,8 +124,9 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
         mcts_stores[cur_player].search_batch(mcts_searches, mcts_batch_size, state,
                                              cur_player, nets[cur_player], step, device=device)
         movel, _ = game.possible_moves(state, cur_player, step)
-        probs, _, movep = mcts_stores[cur_player].get_policy_value(state, movel, cur_player, tau=tau)
-        action = movel[np.random.choice(len(movel), p=movep)]
+        probs, _ = mcts_stores[cur_player].get_policy_value(state, movel, cur_player, tau=tau)
+        chList = actionTable.choList if cur_player < 1 else actionTable.hanList
+        action = chList[np.random.choice(actionTable.AllMoveLength, p=probs)]
         game_history.append((action, probs) if queue is None else (state, step, probs))
         if action not in movel:
             print("Impossible action selected")
@@ -157,7 +157,7 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
                     if prob>0: prar.append([idx, prob])
                 gh.append((action, prar))
             js = {"netIdx":best_idx, "result":net1_result, "username":username, "action":gh}
-            hr = webFunction.http_request(domain+"/selfplay6", True, json.dumps(js))
+            hr = webFunction.http_request(domain+"/selfplay7", True, json.dumps(js))
             if hr == None: sys.exit()
             elif hr['status'] == 'error': print('error occured')
             else: print("game is uploaded")

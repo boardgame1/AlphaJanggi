@@ -1,20 +1,10 @@
-"""
-Monte-Carlo Tree Search
-"""
 import random, math
 import numpy as np
 
-from lib import game, model
+from lib import game, model, actionTable
 
 import torch.nn.functional as F
 
-
-def hanAction(m):
-    a = m // 100;
-    a = (9 - a // 9) * 9 + a % 9
-    b = m % 100;
-    b = (9 - b // 9) * 9 + b % 9
-    return a * 100 + b
 
 class MCTS:
     def __init__(self, c_puct=1.0):
@@ -49,25 +39,20 @@ class MCTS:
             values_avg = self.value_avg[cur_state]
 
             movel, okingp = game.possible_moves(cur_state, cur_player, step)
-            # choose action to take, in the root node add the Dirichlet noise to the probs
             alen = len(actions)
             if alen<1:
                 noises = np.random.dirichlet([0.17] * len(movel))
             max_score = -np.inf
+            chList = actionTable.choList if cur_player < 1 else actionTable.hanList
             for i, m in enumerate(movel):
-                if m<1 or m>9999:
-                    idx = 90 if m<1 else m-10000+91; ma = m
-                    score = values_avg[idx] + self.c_puct * (probs[idx] if alen else
-                            0.75 * probs[idx] + 0.25 * noises[i])* total_sqrt / (1 + counts[idx])
-                else:
-                    ma = hanAction(m) if cur_player > 0 else m
-                    if m%100 == okingp: action = m; mam = ma; break
-                    idx = ma//100; idx2 = ma%100+95
-                    score = values_avg[idx] + values_avg[idx2] + self.c_puct * (probs[idx]+probs[idx2]
-                        if alen else 0.75 * probs[idx]+probs[idx2] + 0.25 * noises[i])* total_sqrt /\
-                            (1 + counts[idx]+counts[idx2])
-                if score>max_score: max_score=score; action = m; mam = ma
-            actions.append(mam)
+                idx = chList.index(m)
+                if m % 100 == okingp: aidx = idx; break
+                score = values_avg[idx] + self.c_puct * (probs[idx] if alen else
+                                                         0.75 * probs[idx] + 0.25 * noises[i]) * total_sqrt / (
+                                    1 + counts[idx])
+                if score > max_score: max_score = score; aidx = idx
+            action = chList[aidx]
+            actions.append(aidx)
             cur_state, won = game.move(cur_state, action, step)
             if won>0:
                 # if somebody won the game, the value of the final state is -1 (as it is on opponent's turn)
@@ -112,50 +97,33 @@ class MCTS:
             probs = probs_v.data.cpu().numpy()
 
             for (leaf_state, states, actions), value, prob in zip(expand_queue, values, probs):
-                self.visit_count[leaf_state] = [0] * model.policy_size
-                self.value[leaf_state] = [0.0] * model.policy_size
-                self.value_avg[leaf_state] = [0.0] * model.policy_size
+                self.visit_count[leaf_state] = [0] * actionTable.AllMoveLength
+                self.value[leaf_state] = [0.0] * actionTable.AllMoveLength
+                self.value_avg[leaf_state] = [0.0] * actionTable.AllMoveLength
                 self.probs[leaf_state] = prob
                 backup_queue.append((value, states, actions))
 
         for value, states, actions in backup_queue:
             cur_value = -value
             for state_int, action in zip(states[::-1], actions[::-1]):
-                for i in range(2):
-                    a1 = 90 if action<1 else action-10000+91 if action>9999 else\
-                        action//100 if i<1 else action%100+95
-                    if i<1 or a1>94:
-                        self.visit_count[state_int][a1] += 1
-                        self.value[state_int][a1] += cur_value
-                        self.value_avg[state_int][a1] =\
-                            self.value[state_int][a1] / self.visit_count[state_int][a1]
+                self.visit_count[state_int][action] += 1
+                self.value[state_int][action] += cur_value
+                self.value_avg[state_int][action] =\
+                    self.value[state_int][action] / self.visit_count[state_int][action]
                 cur_value = -cur_value
 
     def get_policy_value(self, state_int, movel, cur_player, tau=1):
-        counts = self.visit_count[state_int]
-        movep = []
+        counts = [0] * actionTable.AllMoveLength
+        chList = actionTable.choList if cur_player < 1 else actionTable.hanList
         for m in movel:
-            if m<1: movep.append(counts[90])
-            elif m>9999: movep.append(counts[91+m-10000])
-            else:
-                if cur_player>0: m = hanAction(m)
-                movep.append(counts[m//100]+counts[m%100+95])
-        total = sum(movep)
-        if tau == 0 or total<1:
-            probs = [0.0] * model.policy_size
-            a = random.randrange(0, len(movel)) if total<1 else np.argmax(movep)
-            m = movel[a]
-            if m<1: probs[90] = 1
-            elif m>9999: probs[91+m-10000] = 1
-            else:
-                if cur_player > 0: m = hanAction(m)
-                probs[m//100] =  probs[m%100+95] = 0.5
-            movep = [0.0] * len(movel)
-            movep[a] = 1
+            idx = chList.index(m)
+            counts[idx] = self.visit_count[state_int][idx]
+        total = sum(counts)
+        if tau == 0 or total < 1:
+            probs = [0.0] * actionTable.AllMoveLength
+            probs[np.argmax(counts) if total > 0 else chList.index(movel[random.randrange(0, len(movel))])] = 1.0
         else:
-            for i,m in enumerate(movep): movep[i] = m/total
-            total = sum(counts)
+            counts = [count ** (1.0 / tau) for count in counts]
             probs = [count / total for count in counts]
-
         values = self.value_avg[state_int]
-        return probs, values, movep
+        return probs, values
