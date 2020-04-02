@@ -6,7 +6,7 @@ import copy
 import argparse
 import collections
 
-from lib import game, model, mcts
+from lib import game, model, mcts, actionTable
 
 import torch
 import torch.optim as optim
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     checkpoint = torch.load(args.model, map_location=lambda storage, loc: storage)
     if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
     if args.inc: model.resBlockNum +=1
-    net = model.Net(input_shape=model.OBS_SHAPE, actions_n=model.policy_size).to(device)
+    net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
     net.load_state_dict(checkpoint['model'], strict=False)
     best_idx = checkpoint['best_idx']
     print("model loaded", args.model)
@@ -81,7 +81,7 @@ if __name__ == "__main__":
                 movelist, _ = game.possible_moves(pan, idx%2, idx)
                 if action not in movelist:
                     print("Impossible action selected "+step_idx+" "+lidx)
-                probs1 = [0.0] * model.policy_size
+                probs1 = [0.0] * actionTable.AllMoveLength
                 for n in probs:
                     probs1[n[0]] = n[1]
                 replay_buffer.append((pan, idx, probs1, result))

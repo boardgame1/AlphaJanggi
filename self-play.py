@@ -3,7 +3,7 @@ import os, sys, getpass
 import time
 import argparse, json
 
-from lib import model, mcts, webFunction, game
+from lib import model, mcts, webFunction, game, actionTable
 
 import torch
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
             password = getpass.getpass("password: ")
             if password == "": continue
         js = {"username":username, "password":password, "createf":createf}
-        hr = webFunction.http_request(domain+"/user6", True, json.dumps(js))
+        hr = webFunction.http_request(domain+"/user7", True, json.dumps(js))
         if hr == None:
             print("문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.")
             sys.exit()
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         print("wrong model file")
         sys.exit()
     if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
-    net = model.Net(input_shape=model.OBS_SHAPE, actions_n=model.policy_size).to(device)
+    net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
     net.load_state_dict(checkpoint['model'], strict=False)
     net.eval()
 

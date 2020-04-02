@@ -3,7 +3,7 @@ import sys
 import time
 import argparse
 
-from lib import model, game
+from lib import model, game, actionTable
 
 import torch
 
@@ -25,7 +25,7 @@ if __name__ == "__main__":
         checkpoint = torch.load(fname, map_location=lambda storage, loc: storage)
         if 'resBlockNum' in checkpoint:
             model.resBlockNum = checkpoint['resBlockNum']
-        net = model.Net(model.OBS_SHAPE, actions_n=model.policy_size)
+        net = model.Net(model.OBS_SHAPE, actions_n=actionTable.AllMoveLength)
         net.load_state_dict(checkpoint['model'], strict=False)
         net = net.to(device)
         nets.append((fname, net))

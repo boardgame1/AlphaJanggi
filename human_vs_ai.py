@@ -2,7 +2,7 @@
 import argparse, os
 import numpy as np
 import torch
-from lib import game, mcts, model
+from lib import game, mcts, model, actionTable
 
 piece_str = u"초차포마상사졸漢車包馬象士兵"
 def render(pan_str, player_human):
@@ -71,8 +71,9 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
         else:
             mctsi.search_batch(mcts_searches, mcts_batch_size, pan,
                             cur_player, net1, step, device=device)
-            probs, _, movep = mctsi.get_policy_value(pan, movelist, cur_player, tau=tau)
-            action = movelist[np.random.choice(len(movelist), p=movep)]
+            probs, _ = mctsi.get_policy_value(pan, movelist, cur_player, tau=tau)
+            chList = actionTable.choList if cur_player < 1 else actionTable.hanList
+            action = chList[np.random.choice(actionTable.AllMoveLength, p=probs)]
             if step<1: print('한: '+masang[action-10000])
             elif step>1:
                 if action<1: print('한수쉼')
@@ -109,7 +110,7 @@ if __name__ == "__main__":
         checkpoint = torch.load(modelfile, map_location=lambda storage, loc: storage)
         if 'resBlockNum' in checkpoint:
             model.resBlockNum = checkpoint['resBlockNum']
-        net = model.Net(model.OBS_SHAPE, model.policy_size).to(device)
+        net = model.Net(model.OBS_SHAPE, actionTable.AllMoveLength).to(device)
         net.load_state_dict(checkpoint['model'], strict=False)
         net.eval()
 
