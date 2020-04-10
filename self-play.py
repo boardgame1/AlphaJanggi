@@ -7,8 +7,8 @@ from lib import model, mcts, webFunction, game, actionTable
 
 import torch
 
-MCTS_SEARCHES = 10
-MCTS_BATCH_SIZE = 20
+MCTS_SEARCHES = 20
+MCTS_BATCH_SIZE = 40
 STEPS_BEFORE_TAU_0 = 20
 domain = "https://alphajanggi.net"
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
             password = getpass.getpass("password: ")
             if password == "": continue
         js = {"username":username, "password":password, "createf":createf}
-        hr = webFunction.http_request(domain+"/user7", True, json.dumps(js))
+        hr = webFunction.http_request(domain+"/user8", True, json.dumps(js))
         if hr == None:
             print("문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.")
             sys.exit()

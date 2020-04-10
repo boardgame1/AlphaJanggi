@@ -30,8 +30,8 @@ def evaluate(net1, net2, rounds, device="cpu"):
 
     for r_idx in range(rounds):
         r, step = model.play_game(None, mcts_stores, None, net1 if r_idx<rounds//2 else net2,
-                    net2 if r_idx<rounds//2 else net1, steps_before_tau_0=game.MAX_TURN, mcts_searches=20,
-                    mcts_batch_size=20, best_idx=-1, device=device)
+                    net2 if r_idx<rounds//2 else net1, steps_before_tau_0=game.MAX_TURN, mcts_searches=40,
+                    mcts_batch_size=40, best_idx=-1, device=device)
         if (r > 0 and r_idx<rounds//2) or (r < 0 and r_idx>=rounds//2):
             n1_win += 1
         if r!=0: n2_win += 1

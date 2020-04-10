@@ -9,7 +9,7 @@ import torch
 
 
 MCTS_SEARCHES = 20
-MCTS_BATCH_SIZE = 20
+MCTS_BATCH_SIZE = 40
 
 
 if __name__ == "__main__":
