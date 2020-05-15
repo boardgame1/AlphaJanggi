@@ -50,7 +50,7 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
                 render(pan, player_human)
                 if step==2 or step==3:
                     print("")
-                    print("옮기고자 하는 기물의 가로 번호, 세로 번호, 목적지의 가로 번호, 세로 번호 ex) 0010  한수쉼: 0")
+                    print("옮기고자 하는 기물의 세로 번호, 가로 번호, 목적지의 세로 번호, 가로 번호 ex) 0010  한수쉼: 0")
             action = -1
             while action<0:
                 s=input((str(step-1) if step>1 else '')+' ? ')
@@ -74,6 +74,9 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
             probs, _ = mctsi.get_policy_value(pan, movelist, cur_player, tau=tau)
             chList = actionTable.choList if cur_player < 1 else actionTable.hanList
             action = chList[np.random.choice(actionTable.AllMoveLength, p=probs)]
+            """for m in movelist:
+                print('%04d %.2f' % (m, probs[chList.index(m)]), end=',  ')
+            print()"""
             if step<1: print('한: '+masang[action-10000])
             elif step>1:
                 if action<1: print('한수쉼')
