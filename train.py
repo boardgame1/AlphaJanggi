@@ -121,7 +121,7 @@ if __name__ == "__main__":
     net.eval()
     win_ratio = evaluate(net, best_net, rounds=EVALUATION_ROUNDS, device=device)
     print("Net evaluated, win ratio = %.2f" % win_ratio)
-    if win_ratio >= BEST_NET_WIN_RATIO:
+    if win_ratio > BEST_NET_WIN_RATIO:
         print("Net is better than cur best, sync")
         best_net.load_state_dict(net.state_dict())
         best_idx += 1
