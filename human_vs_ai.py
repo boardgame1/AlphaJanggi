@@ -77,8 +77,8 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
             """for m in movelist:
                 print('%04d %.2f' % (m, probs[chList.index(m)]), end=',  ')
             print()"""
-            if step<1: print('한: '+masang[action-10000])
-            elif step>1:
+            if step<2: print(('한: ' if step<1 else '초: ')+masang[action-10000])
+            else:
                 if action<1: print('한수쉼')
                 else:
                     b1=action//100//9
@@ -104,10 +104,9 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model", help="The model to play")
-    parser.add_argument("--cuda", default=False, action="store_true", help="Enable CUDA")
     args = parser.parse_args()
-    device = torch.device("cuda" if args.cuda else "cpu")
-
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
     modelfile = args.model if args.model else "./best_model.pth"
     if os.path.isfile(modelfile):
         checkpoint = torch.load(modelfile, map_location=lambda storage, loc: storage)
