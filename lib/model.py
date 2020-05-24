@@ -95,7 +95,7 @@ def state_lists_to_batch(state_lists, steps_lists, device="cpu"):
 
 
 def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_searches, mcts_batch_size,
-              best_idx, domain=None, username=None, device="cpu"):
+              best_idx, url=None, username=None, device="cpu"):
     assert isinstance(mcts_stores, (mcts.MCTS, type(None), list))
     assert isinstance(net1, Net)
     assert isinstance(net2, Net)
@@ -157,7 +157,7 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
                     if prob>0: prar.append([idx, prob])
                 gh.append((action, prar))
             js = {"netIdx":best_idx, "result":net1_result, "username":username, "action":gh}
-            hr = webFunction.http_request(domain+"/selfplay8", True, json.dumps(js))
+            hr = webFunction.http_request(url, True, json.dumps(js))
             if hr == None: sys.exit()
             elif hr['status'] == 'error': print('error occured')
             else: print("game is uploaded")
