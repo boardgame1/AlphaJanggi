@@ -29,7 +29,6 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
     assert isinstance(mcts_batch_size, int) and mcts_batch_size > 0
 
     pan = game.encode_lists([list(i) for i in game.INITIAL_STATE], 0)
-    capturelist = []
     actionhistory = []
     cur_player = 0
     step = 0
@@ -50,7 +49,7 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
                 render(pan, player_human)
                 if step==2 or step==3:
                     print("")
-                    print("옮기고자 하는 기물의 세로 번호, 가로 번호, 목적지의 세로 번호, 가로 번호 ex) 0010  한수쉼: 0")
+                    print("옮기고자 하는 기물의 세로 번호, 가로 번호, 목적지의 세로 번호, 가로 번호 ex) 0010  한수 쉬기: 0")
             action = -1
             while action<0:
                 s=input((str(step-1) if step>1 else '')+' ? ')
@@ -68,18 +67,22 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
                     if player_human < 1: b4 = 8 - b4
                     action = (b1*9 + b2)*100 + b3*9+b4
                 if action not in movelist: action = -1
+                else: print('OK', flush=True)
         else:
             mctsi.search_batch(mcts_searches, mcts_batch_size, pan,
                             cur_player, net1, step, device=device)
-            probs, _ = mctsi.get_policy_value(pan, movelist, cur_player, tau=tau)
+            probs, values = mctsi.get_policy_value(pan, movelist, cur_player, tau=tau)
             chList = actionTable.choList if cur_player < 1 else actionTable.hanList
-            action = chList[np.random.choice(actionTable.AllMoveLength, p=probs)]
+            n = np.random.choice(actionTable.AllMoveLength, p=probs)
+            action = chList[n]
             """for m in movelist:
                 print('%04d %.2f' % (m, probs[chList.index(m)]), end=',  ')
             print()"""
-            if step<2: print(('한: ' if step<1 else '초: ')+masang[action-10000])
+            if step<2:
+                print(('한: ' if step<1 else '초: ')+masang[action-10000]+' '+str(values[n]), flush=True)
+                if step==1: render(pan, player_human)
             else:
-                if action<1: print('한수쉼')
+                if action<1: print('한수쉼'+' '+str(values[n]))
                 else:
                     b1=action//100//9
                     if player_human<1: b1=9-b1
@@ -89,7 +92,7 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
                     if player_human < 1: b3 = 9 - b3
                     b4 = action%100%9
                     if player_human < 1: b4 = 8 - b4
-                    print((chr(9-b1+a0) if b1>0 else '0')+chr(b2+a0)+(chr(9-b3+a0) if b3>0 else '0')+chr(b4+a0))
+                    print((chr(9-b1+a0) if b1>0 else '0')+chr(b2+a0)+(chr(9-b3+a0) if b3>0 else '0')+chr(b4+a0)+' '+str(values[n]))
         pan, won = game.move(pan, action, step)
         actionhistory.append(action)
         if won>0:
@@ -98,7 +101,7 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
             break
         cur_player = 1-cur_player
         step += 1
-        if step >= game.MAX_TURN:
+        if step >= steps_before_tau_0:
             tau = 0
 
 if __name__ == "__main__":
@@ -106,7 +109,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model", help="The model to play")
     args = parser.parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
+
     modelfile = args.model if args.model else "./best_model.pth"
     if os.path.isfile(modelfile):
         checkpoint = torch.load(modelfile, map_location=lambda storage, loc: storage)
@@ -116,6 +119,6 @@ if __name__ == "__main__":
         net.load_state_dict(checkpoint['model'], strict=False)
         net.eval()
 
-        play_game(net, 20, 60, 80, device)
+        play_game(net, 7, 60, 80, device)
     else:
         print(modelfile+" 파일이 존재하지 않습니다")
