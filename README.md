@@ -20,4 +20,3 @@ python human_vs_ai.py --cuda -m best_1.pth
 &nbsp;&nbsp;  -m (모델 파일 이름) 옵션: 사용하고자 하는 모델 파일(디폴트 best_model.pth)<br>
 <br>
 윈도우 실행 파일과 모델 파일은 위 웹 사이트에서 받을 수 있습니다.<br>
-앞으로 그래픽 기반 대국 프로그램도 만들 생각입니다.<br>
