@@ -89,9 +89,9 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
             chList = actionTable.choList if cur_player < 1 else actionTable.hanList
             n = np.random.choice(actionTable.AllMoveLength, p=probs) if step<steps_before_tau_0 else np.argmax(probs)
             action = chList[n]
-            for m in movelist:
+            """for m in movelist:
                 print('%04d %.2f' % (m, probs[chList.index(m)]), end=',  ')
-            print()
+            print()"""
             if step<2:
                 print(('한: ' if step<1 else '초: ')+masang[action-10000]+' '+str(values[n]), flush=True)
                 if step==1: render(pan, player_human)
