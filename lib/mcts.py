@@ -38,7 +38,7 @@ class MCTS:
             probs = self.probs[cur_state]
             values_avg = self.value_avg[cur_state]
 
-            movel, okingp = game.possible_moves(cur_state, cur_player, step)
+            movel = game.possible_moves(cur_state, cur_player, step)
             alen = len(actions)
             if alen<1:
                 noises = np.random.dirichlet([0.17] * len(movel))
@@ -46,10 +46,8 @@ class MCTS:
             chList = actionTable.choList if cur_player < 1 else actionTable.hanList
             for i, m in enumerate(movel):
                 idx = chList.index(m)
-                if m % 100 == okingp: aidx = idx; break
                 score = values_avg[idx] + self.c_puct * (probs[idx] if alen else
-                                                         0.75 * probs[idx] + 0.25 * noises[i]) * total_sqrt / (
-                                    1 + counts[idx])
+                    0.75 * probs[idx] + 0.25 * noises[i]) * total_sqrt / (1 + counts[idx])
                 if score > max_score: max_score = score; aidx = idx
             action = chList[aidx]
             actions.append(aidx)

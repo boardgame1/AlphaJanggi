@@ -31,7 +31,6 @@ def decode_binary(state_str):
 def possible_moves(pan_str, player, step):
     pan = decode_binary(pan_str)
     moven = []
-    okingp = 0
     if step<2:
         for i in range(4): moven.append(10000+i)
     else:
@@ -52,6 +51,13 @@ def possible_moves(pan_str, player, step):
                                     if(abs(i+k-y)+abs(j-x)<2 or (i==1 and j==4)):
                                         a=pan[i+k][j]
                                         if(a==0 or a//10!=alk):	moven.append((y*9+x)*100+(i+k)*9+j)
+                        if ki%10==KING:
+                            y1=y; j = -1 if y > 5 else 1
+                            while True:
+                                y1 += j
+                                if y1 < 0 or y1 > 9 or pan[y1][x] > 0: break
+                            if (y1 >= 0 and y1 < 10 and pan[y1][x] % 10 == KING):
+                                moven.append((y * 9 + x) * 100 + y1 * 9 + x)
                     elif ki%10 == CHA:
                         if(x==4 and (y==1 or y==8)):
                             for i in range(-1,2,2):
@@ -144,9 +150,8 @@ def possible_moves(pan_str, player, step):
                         if((x==3 or x==5) and (y==2 or y==7)):
                             a=pan[k+1][4]
                             if(a==0 or a//10!=alk): moven.append((y*9+x)*100+(k+1)*9+4)
-                elif ki%10 == KING: okingp = y*9+x
         moven.append(0)
-    return moven, okingp
+    return moven
 
 pieceScore = [13,7,5,3,3,2]
 
@@ -189,5 +194,5 @@ def move(pan_str, move, step):
         pan[y1][x1] = piece
         pan[y0][x0] = 0
 
-        return encode_lists(pan, step+1),\
-               2-captured//10 if captured%10 == KING else 0 if step<MAX_TURN-1 else _endWin(pan)
+        return encode_lists(pan, step+1), 2-captured//10 if captured%10 == KING and piece%10!=KING else\
+            0 if step<MAX_TURN-1 and captured%10!=KING else _endWin(pan)

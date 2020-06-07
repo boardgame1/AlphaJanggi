@@ -123,7 +123,7 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
     while net1_result is None and (value==None or value[0]>0):
         mcts_stores[cur_player].search_batch(mcts_searches, mcts_batch_size, state,
                                              cur_player, nets[cur_player], step, device=device)
-        movel, _ = game.possible_moves(state, cur_player, step)
+        movel = game.possible_moves(state, cur_player, step)
         probs, _ = mcts_stores[cur_player].get_policy_value(state, movel, cur_player, tau=tau)
         chList = actionTable.choList if cur_player < 1 else actionTable.hanList
         action = chList[np.random.choice(actionTable.AllMoveLength, p=probs)]
