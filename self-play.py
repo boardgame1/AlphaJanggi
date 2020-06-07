@@ -34,7 +34,7 @@ if __name__ == "__main__":
             password = getpass.getpass("password: ")
             if password == "": continue
         js = {"username":username, "password":password, "createf":createf}
-        hr = webFunction.http_request(domain+"/user9", True, json.dumps(js))
+        hr = webFunction.http_request(domain+"/user10", True, json.dumps(js))
         if hr == None:
             print("문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.")
             sys.exit()
@@ -49,10 +49,10 @@ if __name__ == "__main__":
     while True:
         print('checking model')
         best_idx = 0
-        mhash = 1
+        mhash = -1
         dfile = "./selfmodel.dat"
         modelfile = "./best_model.pth"
-        if os.path.isfile(dfile):
+        if os.path.isfile(dfile) and os.path.isfile(modelfile):
             df = open(dfile, "r"); s = df.readline(); df.close()
             mhash = int(s[:8], 16)
             best_idx = int(s[8:], 16)
@@ -81,9 +81,9 @@ if __name__ == "__main__":
 
         for i in range(30):
             t = time.time()
-            _, game_steps = model.play_game(None, mcts_store, None, net, net, steps_before_tau_0=game.MAX_TURN,
+            _, game_steps = model.play_game(None, mcts_store, None, net, net, steps_before_tau_0=20,
                     mcts_searches=MCTS_SEARCHES, mcts_batch_size=MCTS_BATCH_SIZE, best_idx=best_idx,
-                                       url=domain+"/selfplay9", username=username, device=device)
+                                       url=domain+"/selfplay10", username=username, device=device)
             game_nodes = len(mcts_store)
             dt = time.time() - t
             speed_steps = game_steps / dt

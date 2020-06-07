@@ -78,7 +78,7 @@ if __name__ == "__main__":
             js = json.loads(s)
             result = -js["result"]
             for idx, (action, probs) in enumerate(js["action"]):
-                movelist, _ = game.possible_moves(pan, idx%2, idx)
+                movelist = game.possible_moves(pan, idx%2, idx)
                 if action not in movelist:
                     print("Impossible action selected "+step_idx+" "+lidx)
                 probs1 = [0.0] * actionTable.AllMoveLength
@@ -89,12 +89,12 @@ if __name__ == "__main__":
                 if idx!=1: result = -result
         if lidx < 0: break
 
-        print(step_idx)
+        print(step_idx, end=' ')
         step_idx += 1
         if len(replay_buffer) < MIN_REPLAY_TO_TRAIN:
             continue
 
-        print("train %d" % (step_idx))
+        print("train")
 
         net.train()
         for _ in range(TRAIN_ROUNDS):

@@ -29,7 +29,7 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
     assert isinstance(mcts_batch_size, int) and mcts_batch_size > 0
 
     pan = game.encode_lists([list(i) for i in game.INITIAL_STATE], 0)
-    actionhistory = []
+    historystr = []
     cur_player = 0
     step = 0
     mctsi = mcts.MCTS()
@@ -40,7 +40,17 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
     player_human = 0 if int(s)<1 else 1
 
     while result is None:
-        movelist, _ = game.possible_moves(pan, cur_player, step)
+        movelist = game.possible_moves(pan, cur_player, step)
+        if step>9 and historystr[-4][:90]==historystr[-8][:90]:
+            p = game.decode_binary(pan)
+            for idx, m in enumerate(movelist):
+                spos = m // 100; tpos = m % 100; y0 = spos // 9; x0 = spos % 9; y1 = tpos // 9; x1 = tpos % 9
+                captured = p[y1][x1]; p[y1][x1] = p[y0][x0]; p[y0][x0] = 0
+                ps = game.encode_lists(p, step+1)
+                if ps[:90]==historystr[-4][:90]:
+                    del movelist[idx]; break
+                p[y0][x0] = p[y1][x1]; p[y1][x1] = captured
+
         if (step<2 and cur_player != player_human) or (step>1 and cur_player == player_human):
             if step < 2:
                 print("마상 차림을 선택하세요 0) "+masang[0]+", 1) "+masang[1]+", 2) "+masang[2]+", 3) "+masang[3])
@@ -56,6 +66,10 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
                 if step<2:
                     if len(s)==1 and s[0]>='0' and s[0]<'4': action = int(s) + 10000
                 elif len(s)==1: action = 0
+                elif s=='undo' and step>3:
+                    step-=2; historystr.pop(); historystr.pop(); pan=historystr[-1]
+                    movelist = game.possible_moves(pan, cur_player, step)
+                    render(pan, player_human)
                 elif len(s)==4 and s[0]>='0' and s[0]<='9' and s[1]>'0' and s[1]<='9' and s[2]>='0' and s[2]<='9' and s[3]>'0' and s[3]<='9':
                     b1=9-ord(s[0])+a0 if s[0]>'0' else 0
                     if player_human<1: b1=9-b1
@@ -75,9 +89,9 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
             chList = actionTable.choList if cur_player < 1 else actionTable.hanList
             n = np.random.choice(actionTable.AllMoveLength, p=probs) if step<steps_before_tau_0 else np.argmax(probs)
             action = chList[n]
-            """for m in movelist:
+            for m in movelist:
                 print('%04d %.2f' % (m, probs[chList.index(m)]), end=',  ')
-            print()"""
+            print()
             if step<2:
                 print(('한: ' if step<1 else '초: ')+masang[action-10000]+' '+str(values[n]), flush=True)
                 if step==1: render(pan, player_human)
@@ -95,7 +109,7 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
                     print((chr(9-b1+a0) if b1>0 else '0')+chr(b2+a0)+(chr(9-b3+a0) if b3>0 else '0')+chr(b4+a0)+' '+str(values[n]))
         if exitf: break
         pan, won = game.move(pan, action, step)
-        actionhistory.append(action)
+        historystr.append(pan)
         if won>0:
             render(pan, player_human)
             print(('초' if won==1 else '한')+' 승')
