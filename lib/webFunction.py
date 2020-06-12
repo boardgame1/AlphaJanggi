@@ -1,5 +1,5 @@
 import requests
-import os
+import os, time
 from urllib.request import urlopen, Request
 from tqdm import tqdm
 
@@ -36,6 +36,7 @@ def http_request(url, post=False, data=None):
                 break
         except Exception as e:
             print(f"Error occurs when request {url}: {e}")
+        time.sleep(5)
     return r.json() if success else None
 
 def download_file(url, save_path):
