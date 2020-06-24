@@ -4,7 +4,7 @@ import json
 import random
 import copy
 import argparse
-import collections
+import collections, time
 
 from lib import game, model, mcts, actionTable
 
@@ -44,14 +44,14 @@ if __name__ == "__main__":
     parser.add_argument("--cuda", default=False, action="store_true", help="Enable CUDA")
     parser.add_argument("--inc", default=False, action="store_true", help="Increase resBlockNum")
     parser.add_argument("-m", "--model", help="Model to load")
+    parser.add_argument("-bm", "--bmodel", help="Base model")
     args = parser.parse_args()
     device = torch.device("cuda" if args.cuda else "cpu")
 
     saves_path = "saves"
     os.makedirs(saves_path, exist_ok=True)
 
-    step_idx = 0
-    best_idx = 1
+    step_idx = 0;
 
     checkpoint = torch.load(args.model, map_location=lambda storage, loc: storage)
     if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
@@ -59,16 +59,22 @@ if __name__ == "__main__":
     net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
     net.load_state_dict(checkpoint['model'], strict=False)
     best_idx = checkpoint['best_idx']
-    print("model loaded", args.model)
+    resNum = model.resBlockNum
 
-    best_net = copy.deepcopy(net)
+    if args.bmodel:
+        checkpoint = torch.load(args.bmodel, map_location=lambda storage, loc: storage)
+        if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
+        best_net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
+        best_net.load_state_dict(checkpoint['model'], strict=False)
+    else: best_net = copy.deepcopy(net)
     best_net.eval()
     optimizer = optim.SGD(net.parameters(), lr=LEARNING_RATE, momentum=0.9)
-    print('best_idx: '+str(best_idx)+'  resBlockNum: '+str(model.resBlockNum))
+    print('best_idx: '+str(best_idx)+'  resBlockNum: '+str(resNum))
 
+    net.train()
     replay_buffer = collections.deque(maxlen=REPLAY_BUFFER)
     f = open("./train.dat", "r")
-
+    ptime = time.time()
     while True:
         for lidx in range(PLAY_EPISODES):
             pan = game.encode_lists([list(i) for i in game.INITIAL_STATE], 0)
@@ -78,9 +84,9 @@ if __name__ == "__main__":
             js = json.loads(s)
             result = -js["result"]
             for idx, (action, probs) in enumerate(js["action"]):
-                movelist = game.possible_moves(pan, idx%2, idx)
+                """movelist = game.possible_moves(pan, idx%2, idx)
                 if action not in movelist:
-                    print("Impossible action selected "+step_idx+" "+lidx)
+                    print("Impossible action selected "+step_idx+" "+lidx)"""
                 probs1 = [0.0] * actionTable.AllMoveLength
                 for n in probs:
                     probs1[n[0]] = n[1]
@@ -94,9 +100,10 @@ if __name__ == "__main__":
         if len(replay_buffer) < MIN_REPLAY_TO_TRAIN:
             continue
 
-        print("train")
+        ctime=time.time()
+        print("%f "%(ctime-ptime))
+        ptime=ctime
 
-        net.train()
         for _ in range(TRAIN_ROUNDS):
             batch = random.sample(replay_buffer, BATCH_SIZE)
             batch_states, batch_steps, batch_probs, batch_values = zip(*batch)
@@ -123,8 +130,9 @@ if __name__ == "__main__":
     print("Net evaluated, win ratio = %.2f" % win_ratio)
     if win_ratio > BEST_NET_WIN_RATIO:
         print("Net is better than cur best, sync")
-        best_net.load_state_dict(net.state_dict())
         best_idx += 1
         file_name = os.path.join(saves_path, "best_%d.pth" % (best_idx))
-        torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': model.resBlockNum}, file_name)
-
+        torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': resNum}, file_name)
+    else:
+        file_name = os.path.join('.', "best_%d%s.pth" % (best_idx, '_1' if args.inc else ''))
+        torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': resNum}, file_name)
