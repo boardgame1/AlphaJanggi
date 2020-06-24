@@ -136,5 +136,6 @@ if __name__ == "__main__":
         file_name = os.path.join(saves_path, "best_%d.pth" % (best_idx))
         torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': resNum}, file_name)
     else:
-        file_name = os.path.join('.', "best_%d%s.pth" % (best_idx, '_1' if args.inc else ''))
+        fns = args.tmodel if args.tmodel else "best_%d%s.pth" % (best_idx, '_1' if args.inc else '')
+        file_name = os.path.join('.', fns)
         torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': resNum}, file_name)
