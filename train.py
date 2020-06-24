@@ -61,7 +61,6 @@ if __name__ == "__main__":
     best_net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
     best_net.load_state_dict(checkpoint['model'], strict=False)
     best_idx = checkpoint['best_idx']
-    resNum = model.resBlockNum
 
     if args.tmodel:
         checkpoint = torch.load(args.tmodel, map_location=lambda storage, loc: storage)
@@ -70,6 +69,7 @@ if __name__ == "__main__":
         net.load_state_dict(checkpoint['model'], strict=False)
     else: net = copy.deepcopy(best_net)
     best_net.eval()
+    resNum = model.resBlockNum
     optimizer = optim.SGD(net.parameters(), lr=LEARNING_RATE, momentum=0.9)
     print('best_idx: '+str(best_idx)+'  resBlockNum: '+str(resNum))
 
