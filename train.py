@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os
+import os, sys
 import json
 import random
 import copy
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     parser.add_argument("--cuda", default=False, action="store_true", help="Enable CUDA")
     parser.add_argument("--inc", default=False, action="store_true", help="Increase resBlockNum")
     parser.add_argument("-m", "--model", help="Model to load")
-    parser.add_argument("-bm", "--bmodel", help="Base model")
+    parser.add_argument("-tm", "--tmodel", help="Temp model")
     args = parser.parse_args()
     device = torch.device("cuda" if args.cuda else "cpu")
 
@@ -53,20 +53,22 @@ if __name__ == "__main__":
 
     step_idx = 0;
 
+    if args.tmodel and args.inc: print('invalid argument'); sys.exit()
+
     checkpoint = torch.load(args.model, map_location=lambda storage, loc: storage)
     if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
     if args.inc: model.resBlockNum +=1
-    net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
-    net.load_state_dict(checkpoint['model'], strict=False)
+    best_net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
+    best_net.load_state_dict(checkpoint['model'], strict=False)
     best_idx = checkpoint['best_idx']
     resNum = model.resBlockNum
 
-    if args.bmodel:
-        checkpoint = torch.load(args.bmodel, map_location=lambda storage, loc: storage)
+    if args.tmodel:
+        checkpoint = torch.load(args.tmodel, map_location=lambda storage, loc: storage)
         if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
-        best_net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
-        best_net.load_state_dict(checkpoint['model'], strict=False)
-    else: best_net = copy.deepcopy(net)
+        net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
+        net.load_state_dict(checkpoint['model'], strict=False)
+    else: net = copy.deepcopy(best_net)
     best_net.eval()
     optimizer = optim.SGD(net.parameters(), lr=LEARNING_RATE, momentum=0.9)
     print('best_idx: '+str(best_idx)+'  resBlockNum: '+str(resNum))
