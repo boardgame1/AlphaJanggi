@@ -36,6 +36,7 @@ def play(val, lock, mcts_store, net, best_idx, username, device, step_idx):
         if bf: break
 
 if __name__ == "__main__":
+    mp.freeze_support()
     parser = argparse.ArgumentParser()
     parser.add_argument("--cuda", default=False, action="store_true", help="Enable CUDA")
     parser.add_argument("--numproc", type=int, default=1, help="Number of process")
