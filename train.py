@@ -17,7 +17,7 @@ PLAY_EPISODES = 25
 REPLAY_BUFFER = 30000
 LEARNING_RATE = 0.01
 BATCH_SIZE = 256
-TRAIN_ROUNDS = 10
+TRAIN_ROUNDS = 20
 MIN_REPLAY_TO_TRAIN = 10000
 
 BEST_NET_WIN_RATIO = 0.55
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     saves_path = "saves"
     os.makedirs(saves_path, exist_ok=True)
 
-    step_idx = 0;
+    step_idx = 0
 
     if args.tmodel and args.inc: print('invalid argument'); sys.exit()
 
@@ -64,6 +64,7 @@ if __name__ == "__main__":
 
     if args.tmodel:
         checkpoint = torch.load(args.tmodel, map_location=lambda storage, loc: storage)
+        if best_idx != checkpoint['best_idx']: print('invalid tmodel'); sys.exit()
         if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
         net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
         net.load_state_dict(checkpoint['model'], strict=False)
@@ -126,6 +127,10 @@ if __name__ == "__main__":
             optimizer.step()
     f.close()
 
+    fns = args.tmodel if args.tmodel else "best_%d%s.pth" % (best_idx, '_1' if args.inc else '')
+    file_name = os.path.join('.', fns)
+    torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': resNum}, file_name)
+
     print("Net evaluation started")
     net.eval()
     win_ratio = evaluate(net, best_net, rounds=EVALUATION_ROUNDS, device=device)
@@ -134,8 +139,4 @@ if __name__ == "__main__":
         print("Net is better than cur best, sync")
         best_idx += 1
         file_name = os.path.join(saves_path, "best_%d.pth" % (best_idx))
-        torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': resNum}, file_name)
-    else:
-        fns = args.tmodel if args.tmodel else "best_%d%s.pth" % (best_idx, '_1' if args.inc else '')
-        file_name = os.path.join('.', fns)
         torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': resNum}, file_name)
