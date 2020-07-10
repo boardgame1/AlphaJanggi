@@ -8,8 +8,8 @@ from lib import model, mcts, webFunction, actionTable
 import torch
 import torch.multiprocessing as mp
 
-MCTS_SEARCHES = 10
-MCTS_BATCH_SIZE = 80
+MCTS_SEARCHES = 20
+MCTS_BATCH_SIZE = 40
 STEPS_BEFORE_TAU_0 = 20
 PLAY_EPISODE = 30
 domain = "https://alphajanggi.net"
