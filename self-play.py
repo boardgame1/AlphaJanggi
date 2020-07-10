@@ -8,8 +8,8 @@ from lib import model, mcts, webFunction, actionTable
 import torch
 import torch.multiprocessing as mp
 
-MCTS_SEARCHES = 20
-MCTS_BATCH_SIZE = 40
+MCTS_SEARCHES = 10
+MCTS_BATCH_SIZE = 80
 STEPS_BEFORE_TAU_0 = 20
 PLAY_EPISODE = 30
 domain = "https://alphajanggi.net"
@@ -130,7 +130,7 @@ if __name__ == "__main__":
                 processes.append(p)
             while 1:
                 lock.acquire()
-                if mar[1]>=PLAY_EPISODE * num_proc: mar[0]=0
+                if mar[0]>0 and mar[1]>=PLAY_EPISODE * num_proc: mar[0]=0
                 lock.release()
                 running = any(p.is_alive() for p in processes)
                 if not running:
