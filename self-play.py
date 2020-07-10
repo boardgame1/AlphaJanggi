@@ -28,11 +28,10 @@ def play(val, lock, mcts_store, net, best_idx, username, device, step_idx):
         bf = False
         lock.acquire()
         val[1] += 1
+        if val[0]<=0: bf=True
+        lock.release()
         print("Step %d, steps %3d, leaves %4d, steps/s %5.2f, leaves/s %6.2f, best_idx %d" % (
             step_idx+val[1], game_steps, game_nodes, speed_steps, speed_nodes, best_idx))
-        if val[0]>0: val[0] -= 1
-        else: bf=True
-        lock.release()
         if bf: break
 
 if __name__ == "__main__":
@@ -122,7 +121,7 @@ if __name__ == "__main__":
                 print("Step %d, steps %3d, leaves %4d, steps/s %5.2f, leaves/s %6.2f, best_idx %d" % (
                     step_idx, game_steps, game_nodes, speed_steps, speed_nodes, best_idx))
         else:
-            processes = []; mar = mp.Array('i', 2); mar[0] = PLAY_EPISODE * num_proc
+            processes = []; mar = mp.Array('i', 2); mar[0] = 1
             for i in range(num_proc):
                 mcts_store = mcts.MCTS()
                 p = mp.Process(target=play, args=(mar, lock, mcts_store, net, best_idx,
@@ -130,6 +129,9 @@ if __name__ == "__main__":
                 p.start()
                 processes.append(p)
             while 1:
+                lock.acquire()
+                if mar[1]>=PLAY_EPISODE * num_proc: mar[0]=0
+                lock.release()
                 running = any(p.is_alive() for p in processes)
                 if not running:
                     break
