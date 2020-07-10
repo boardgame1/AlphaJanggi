@@ -17,7 +17,7 @@ domain = "https://alphajanggi.net"
 def play(val, lock, mcts_store, net, best_idx, username, device, step_idx):
     while True:
         t = time.time()
-        _, game_steps = model.play_game(None, mcts_store, None, net, net, steps_before_tau_0=STEPS_BEFORE_TAU_0,
+        _, game_steps = model.play_game(val, mcts_store, None, net, net, steps_before_tau_0=STEPS_BEFORE_TAU_0,
                             mcts_searches=MCTS_SEARCHES, mcts_batch_size=MCTS_BATCH_SIZE, best_idx=best_idx,
                             url=domain + "/selfplay10", username=username, device=device)
         game_nodes = len(mcts_store)
