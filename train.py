@@ -104,7 +104,8 @@ if __name__ == "__main__":
             continue
 
         ctime=time.time()
-        print("%f "%(ctime-ptime))
+        print("%.2f "%(ctime-ptime), end=' ')
+        if step_idx%5<1: print()
         ptime=ctime
 
         for _ in range(TRAIN_ROUNDS):
@@ -127,6 +128,11 @@ if __name__ == "__main__":
             optimizer.step()
     f.close()
 
+    if args.inc==False and (args.tmodel==None or args.tmodel.find('_1.')<0):
+        cn=0
+        if args.tmodel:
+            f=open('./count.txt', 'r'); s=f.readline(); cn=int(s); f.close()
+        f = open('./count.txt', 'w'); cn+=step_idx; f.write(str(cn)+'\n'); f.close()
     fns = args.tmodel if args.tmodel else "best_%d%s.pth" % (best_idx, '_1' if args.inc else '')
     file_name = os.path.join('.', fns)
     torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': resNum}, file_name)
@@ -135,7 +141,7 @@ if __name__ == "__main__":
     net.eval()
     win_ratio = evaluate(net, best_net, rounds=EVALUATION_ROUNDS, device=device)
     print("Net evaluated, win ratio = %.2f" % win_ratio)
-    if win_ratio > BEST_NET_WIN_RATIO:
+    if win_ratio >= BEST_NET_WIN_RATIO:
         print("Net is better than cur best, sync")
         best_idx += 1
         file_name = os.path.join(saves_path, "best_%d.pth" % (best_idx))
