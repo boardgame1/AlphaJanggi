@@ -22,11 +22,13 @@ def render(pan_str, player_human):
                 if y==1 or y>7 else "  │  │  │  │  │  │  │  │  │ ")
 
 masang = ['마상마상','상마상마','마상상마', '상마마상']
-def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="cpu"):
+mcts_searches = 60
+LEVELC = 16
+def play_game(net1, steps_before_tau_0, mcts_batch_size, device="cpu"):
     assert isinstance(net1, model.Net)
     assert isinstance(steps_before_tau_0, int) and steps_before_tau_0 >= 0
-    assert isinstance(mcts_searches, int) and mcts_searches > 0
     assert isinstance(mcts_batch_size, int) and mcts_batch_size > 0
+    global mcts_searches
 
     pan = game.encode_lists([list(i) for i in game.INITIAL_STATE], 0)
     historystr = []
@@ -36,8 +38,14 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
 
     result = None; exitf = False
     a0 = ord('1')
-    s=input('플레이하려는 진영을 선택하세요 0) 초, 1)한 ?')
-    player_human = 0 if int(s)<1 else 1
+    while True:
+        s=input('플레이하려는 진영을 선택하세요 0) 초, 1)한 ?')
+        if s.find('level') >= 0:
+            mcts_searches = LEVELC * int(s[6:])
+            print('OK', flush=True)
+        else:
+            player_human = 0 if int(s)<1 else 1
+            break
 
     while result is None:
         movelist = game.possible_moves(pan, cur_player, step)
@@ -63,7 +71,9 @@ def play_game(net1, steps_before_tau_0, mcts_searches, mcts_batch_size, device="
             while action<0:
                 s=input((str(step-1) if step>1 else '')+' ? ')
                 if s=="new": exitf=True; break
-                if step<2:
+                elif s.find('level')>=0:
+                    mcts_searches=LEVELC*int(s[6:]); print('OK', flush=True)
+                elif step<2:
                     if len(s)==1 and s[0]>='0' and s[0]<'4': action = int(s) + 10000
                 elif len(s)==1: action = 0
                 elif s=='undo' and step>3:
@@ -135,6 +145,6 @@ if __name__ == "__main__":
         net.eval()
 
         while True:
-            play_game(net, 7, 60, 80, device)
+            play_game(net, 7, 80, device)
     else:
         print(modelfile+" 파일이 존재하지 않습니다")
