@@ -27,11 +27,12 @@ def play(val, lock, mcts_store, net, best_idx, username, device, step_idx):
 
         bf = False
         lock.acquire()
-        val[1] += 1
+        if game_steps>0: val[1] += 1
         if val[0]<=0: bf=True
         lock.release()
-        print("Step %d, steps %3d, leaves %4d, steps/s %5.2f, leaves/s %6.2f, best_idx %d" % (
-            step_idx+val[1], game_steps, game_nodes, speed_steps, speed_nodes, best_idx))
+        if game_steps>0:
+            print("Step %d, steps %3d, leaves %4d, steps/s %5.2f, leaves/s %6.2f, best_idx %d" % (
+                step_idx+val[1], game_steps, game_nodes, speed_steps, speed_nodes, best_idx))
         if bf: break
 
 if __name__ == "__main__":
