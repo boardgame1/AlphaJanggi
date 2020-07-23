@@ -14,18 +14,19 @@ INITIAL_STATE = ((2,0,0,6,0,6,0,0,2),(0,0,0,0,1,0,0,0,0),(0,3,0,0,0,0,0,3,0),(7,
 MAX_TURN = 202
 
 def encode_lists(pan, step):
-    s = ""
+    s = ""; b=ord('a')
     for y in range(10):
         for x in range(9):
-            s += str(chr(pan[y][x]+ord('a')))
+            s += str(chr(pan[y][x]+b))
     return s + str(step)
 
 def decode_binary(state_str):
-    pan = []
+    pan = []; a=0; b=ord('a')
     for y in range(10):
         pan.append([])
         for x in range(9):
-            pan[y].append(ord(state_str[y*9+x])-ord('a'))
+            pan[y].append(ord(state_str[a])-b)
+            a+=1
     return pan
 
 def possible_moves(pan_str, player, step):
