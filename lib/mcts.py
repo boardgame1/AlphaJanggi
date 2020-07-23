@@ -44,8 +44,9 @@ class MCTS:
                 noises = np.random.dirichlet([0.17] * len(movel))
             max_score = -np.inf
             chList = actionTable.choList if cur_player < 1 else actionTable.hanList
+            chDict = actionTable.choDict if cur_player < 1 else actionTable.hanDict
             for i, m in enumerate(movel):
-                idx = chList.index(m)
+                idx = chDict[m]
                 score = values_avg[idx] + self.c_puct * (probs[idx] if alen else
                     0.75 * probs[idx] + 0.25 * noises[i]) * total_sqrt / (1 + counts[idx])
                 if score > max_score: max_score = score; aidx = idx

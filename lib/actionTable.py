@@ -58,3 +58,6 @@ def create_action_labels():
 
 choList, hanList = create_action_labels()
 AllMoveLength = len(choList) # 2455
+
+choDict = dict(zip(choList,range(AllMoveLength)))
+hanDict = dict(zip(hanList,range(AllMoveLength)))
