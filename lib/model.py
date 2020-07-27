@@ -8,7 +8,7 @@ from lib import game, mcts, webFunction, actionTable
 
 
 NUM_FILTERS = 128
-OBS_SHAPE = (17, game.GAME_ROWS, game.GAME_COLS)
+OBS_SHAPE = (15, game.GAME_ROWS, game.GAME_COLS)
 resBlockNum = 1
 
 class Net(nn.Module):
@@ -75,10 +75,9 @@ def _encode_list_state(dest_np, state_list, step):
 
     who_move = step %2
     for row_idx, row in enumerate(state_list):
-        ridx = row_idx if who_move < 1 else 9 - row_idx
         for col_idx, cell in enumerate(row):
             if cell>0:
-                dest_np[cell%10-1+(cell//10 if who_move<1 else 1-cell//10)*7, ridx, col_idx] = 1.0
+                dest_np[cell%10-1+(cell//10 if who_move<1 else 1-cell//10)*7, row_idx, col_idx] = 1.0
     ci=8
     while step>0:
         if step%2>0: dest_np[14, 0, ci] = 1.0
@@ -125,8 +124,7 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
                                              cur_player, nets[cur_player], step, device=device)
         movel = game.possible_moves(state, cur_player, step)
         probs, _ = mcts_stores[cur_player].get_policy_value(state, movel, cur_player, tau=tau)
-        chList = actionTable.choList if cur_player < 1 else actionTable.hanList
-        action = chList[np.random.choice(actionTable.AllMoveLength, p=probs)]
+        action = actionTable.moveTable[np.random.choice(actionTable.AllMoveLength, p=probs)]
         game_history.append((action, probs) if queue is None else (state, step, probs))
         if action not in movel:
             print("Impossible action selected")

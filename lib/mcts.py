@@ -43,14 +43,11 @@ class MCTS:
             if alen<1:
                 noises = np.random.dirichlet([0.17] * len(movel))
             max_score = -np.inf
-            chList = actionTable.choList if cur_player < 1 else actionTable.hanList
-            chDict = actionTable.choDict if cur_player < 1 else actionTable.hanDict
             for i, m in enumerate(movel):
-                idx = chDict[m]
+                idx = actionTable.moveDict[m]
                 score = values_avg[idx] + self.c_puct * (probs[idx] if alen else
                     0.75 * probs[idx] + 0.25 * noises[i]) * total_sqrt / (1 + counts[idx])
-                if score > max_score: max_score = score; aidx = idx
-            action = chList[aidx]
+                if score > max_score: max_score = score; aidx = idx; action = m
             actions.append(aidx)
             cur_state, won = game.move(cur_state, action, step)
             if won>0:
@@ -113,14 +110,14 @@ class MCTS:
 
     def get_policy_value(self, state_int, movel, cur_player, tau=1):
         counts = [0] * actionTable.AllMoveLength
-        chList = actionTable.choList if cur_player < 1 else actionTable.hanList
         for m in movel:
-            idx = chList.index(m)
+            idx = actionTable.moveDict[m]
             counts[idx] = self.visit_count[state_int][idx]
         total = sum(counts)
         if tau == 0 or total < 1:
             probs = [0.0] * actionTable.AllMoveLength
-            probs[np.argmax(counts) if total > 0 else chList.index(movel[random.randrange(0, len(movel))])] = 1.0
+            probs[np.argmax(counts) if total > 0 else
+                actionTable.moveDict[movel[random.randrange(0, len(movel))]]] = 1.0
         else:
             counts = [count ** (1.0 / tau) for count in counts]
             probs = [count / total for count in counts]
