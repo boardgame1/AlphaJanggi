@@ -119,7 +119,7 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
     result = None
 
     while net1_result is None and (value==None or value[0]>0):
-        mcts_stores[0].clear(); mcts_stores[1].clear()
+        mcts_stores[cur_player].clear()
         mcts_stores[cur_player].search_batch(mcts_searches, mcts_batch_size, state,
                                              cur_player, nets[cur_player], step, device=device)
         movel = game.possible_moves(state, cur_player, step)
