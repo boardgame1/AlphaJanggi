@@ -13,7 +13,7 @@ MCTS_BATCH_SIZE = 40
 STEPS_BEFORE_TAU_0 = 20
 PLAY_EPISODE = 30
 domain = "https://alphajanggi.net"
-URL  = domain + "/selfplay10"
+URL  = domain + "/selfplay11"
 
 def play(val, lock, mcts_store, net, best_idx, username, device, step_idx):
     while True:
@@ -61,7 +61,7 @@ if __name__ == "__main__":
             password = getpass.getpass("password: ")
             if password == "": continue
         js = {"username":username, "password":password, "createf":createf}
-        hr = webFunction.http_request(domain+"/user10", True, json.dumps(js))
+        hr = webFunction.http_request(domain+"/user11", True, json.dumps(js))
         if hr == None:
             print("문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.")
             sys.exit()

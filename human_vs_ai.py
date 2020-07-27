@@ -96,9 +96,8 @@ def play_game(net1, steps_before_tau_0, mcts_batch_size, device="cpu"):
             mctsi.search_batch(mcts_searches, mcts_batch_size, pan,
                             cur_player, net1, step, device=device)
             probs, values = mctsi.get_policy_value(pan, movelist, cur_player)
-            chList = actionTable.choList if cur_player < 1 else actionTable.hanList
             n = np.random.choice(actionTable.AllMoveLength, p=probs) if step<steps_before_tau_0 else np.argmax(probs)
-            action = chList[n]
+            action = actionTable.moveTable[n]
             """for m in movelist:
                 print('%04d %.2f' % (m, probs[chList.index(m)]), end=',  ')
             print()"""
