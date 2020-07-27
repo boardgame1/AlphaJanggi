@@ -83,6 +83,7 @@ def _encode_list_state(dest_np, state_list, step):
         if step%2>0: dest_np[14, 0, ci] = 1.0
         step //=2
         ci -= 1
+    if who_move>0: dest_np[14, 9, 0] = 1.0
 
 def state_lists_to_batch(state_lists, steps_lists, device="cpu"):
     assert isinstance(state_lists, list)
