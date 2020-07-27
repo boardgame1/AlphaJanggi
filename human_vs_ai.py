@@ -93,6 +93,7 @@ def play_game(net1, steps_before_tau_0, mcts_batch_size, device="cpu"):
                 if action not in movelist: action = -1
                 else: print('OK', flush=True)
         else:
+            mctsi.clear()
             mctsi.search_batch(mcts_searches, mcts_batch_size, pan,
                             cur_player, net1, step, device=device)
             probs, values = mctsi.get_policy_value(pan, movelist, cur_player)
