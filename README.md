@@ -21,3 +21,7 @@ python human_vs_ai.py --cuda -m best_1.pth
 &nbsp;&nbsp;  -m (모델 파일 이름): 사용하고자 하는 모델 파일(디폴트 best_model.pth)<br>
 <br>
 윈도우 실행 파일과 모델 파일은 위 웹 사이트에서 받을 수 있습니다.<br>
+
+<h3>지원</h3>
+ ai hub (http://aihub.or.kr 컴퓨팅 자원)<br>
+ JetBrains (https://www.jetbrains.com jetbrains 모든 제품의 1년 정식 라이센스)
