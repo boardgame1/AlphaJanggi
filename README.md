@@ -24,4 +24,4 @@ python human_vs_ai.py --cuda -m best_1.pth
 
 <h3>지원</h3>
  ai hub (http://aihub.or.kr 컴퓨팅 자원)<br>
- JetBrains (https://www.jetbrains.com/ko-kr 모든 jetbrains 제품의 1년 정식 라이센스)
+ JetBrains (https://www.jetbrains.com/ko-kr 모든 jetbrains 제품의 1년 라이센스)
