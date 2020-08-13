@@ -23,5 +23,5 @@ python human_vs_ai.py --cuda -m best_1.pth
 윈도우 실행 파일과 모델 파일은 위 웹 사이트에서 받을 수 있습니다.<br>
 
 <h4>지원</h4>
- ai hub http://aihub.or.kr : 컴퓨팅 자원<br>
+ AI Hub http://aihub.or.kr : 컴퓨팅 자원<br>
  JetBrains https://www.jetbrains.com/ko-kr : 모든 jetbrains 제품의 1년 라이센스
