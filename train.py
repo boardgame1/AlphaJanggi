@@ -15,7 +15,7 @@ import torch.nn.functional as F
 
 PLAY_EPISODES = 25
 REPLAY_BUFFER = 30000
-LEARNING_RATE = 0.01
+LEARNING_RATE = 0.1
 BATCH_SIZE = 256
 TRAIN_ROUNDS = 20
 MIN_REPLAY_TO_TRAIN = 10000
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     if args.tmodel and args.inc: print('invalid argument'); sys.exit()
 
     checkpoint = torch.load(args.model, map_location=lambda storage, loc: storage)
-    if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
+    model.resBlockNum = checkpoint['resBlockNum']
     if args.inc: model.resBlockNum +=1
     best_net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
     best_net.load_state_dict(checkpoint['model'], strict=False)
@@ -65,13 +65,14 @@ if __name__ == "__main__":
     if args.tmodel:
         checkpoint = torch.load(args.tmodel, map_location=lambda storage, loc: storage)
         if best_idx != checkpoint['best_idx']: print('invalid tmodel'); sys.exit()
-        if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
+        model.resBlockNum = checkpoint['resBlockNum']
         net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
         net.load_state_dict(checkpoint['model'], strict=False)
     else: net = copy.deepcopy(best_net)
     best_net.eval()
     resNum = model.resBlockNum
     optimizer = optim.SGD(net.parameters(), lr=LEARNING_RATE, momentum=0.9)
+    if args.tmodel: optimizer.load_state_dict(checkpoint['opt'])
     print('best_idx: '+str(best_idx)+'  resBlockNum: '+str(resNum))
 
     net.train()
@@ -128,20 +129,21 @@ if __name__ == "__main__":
             optimizer.step()
     f.close()
 
-    if args.inc==False and (args.tmodel==None or args.tmodel.find('_1.')<0):
+    if args.inc==False and (args.tmodel==None or args.tmodel.find('_a.')<0):
         cn=0
         if args.tmodel:
             f=open('./count.txt', 'r'); s=f.readline(); cn=int(s); f.close()
         f = open('./count.txt', 'w'); cn+=step_idx; f.write(str(cn)+'\n'); f.close()
-    fns = args.tmodel if args.tmodel else "best_%d%s.pth" % (best_idx, '_1' if args.inc else '')
+    fns = args.tmodel if args.tmodel else "best_%d%s.pth" % (best_idx, '_a' if args.inc else '')
     file_name = os.path.join('.', fns)
-    torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': resNum}, file_name)
+    torch.save({'model': net.state_dict(), 'best_idx': best_idx, 'resBlockNum': resNum,
+                'opt': optimizer.state_dict()}, file_name)
 
     print("Net evaluation started")
     net.eval()
     win_ratio = evaluate(net, best_net, rounds=EVALUATION_ROUNDS, device=device)
     print("Net evaluated, win ratio = %.2f" % win_ratio)
-    if win_ratio >= BEST_NET_WIN_RATIO:
+    if win_ratio > BEST_NET_WIN_RATIO:
         print("Net is better than cur best, sync")
         best_idx += 1
         file_name = os.path.join(saves_path, "best_%d.pth" % (best_idx))
