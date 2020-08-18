@@ -11,6 +11,7 @@ from lib import game, model, mcts, actionTable
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
+import torch.multiprocessing as mp
 
 
 PLAY_EPISODES = 25
@@ -21,22 +22,29 @@ TRAIN_ROUNDS = 20
 MIN_REPLAY_TO_TRAIN = 10000
 
 BEST_NET_WIN_RATIO = 0.55
+NUM_PROC = 5
+EVALUATION_ROUNDS = 100
 
-EVALUATION_ROUNDS = 20
-
-def evaluate(net1, net2, rounds, device="cpu"):
-    n1_win, n2_win = 0, 0
+def eval(val, lock, net1, net2, device, cpuf):
+    if cpuf: net1.to(device); net2.to(device)
     mcts_stores = [mcts.MCTS(), mcts.MCTS()]
+    while True:
+        lock.acquire()
+        are = (val[1]+val[2]) % 2
+        lock.release()
+        r, _ = model.play_game(val, mcts_stores, None, net1=net1 if are<1 else net2,
+                net2=net2 if are<1 else net1, steps_before_tau_0=0,
+                            mcts_searches=40, mcts_batch_size=40, best_idx=-1, device=device)
 
-    for r_idx in range(rounds):
-        r, step = model.play_game(None, mcts_stores, None, net1 if r_idx<rounds//2 else net2,
-                    net2 if r_idx<rounds//2 else net1, steps_before_tau_0=game.MAX_TURN, mcts_searches=40,
-                    mcts_batch_size=40, best_idx=-1, device=device)
-        if (r > 0 and r_idx<rounds//2) or (r < 0 and r_idx>=rounds//2):
-            n1_win += 1
-        if r!=0: n2_win += 1
-        print(r_idx, r, step)
-    return (n1_win / n2_win) if n2_win>0 else 0.5
+        bf = False
+        lock.acquire()
+        if r!=None:
+            val[1 if (r > 0.5 and are<1) or (r<-0.5 and are>0) else 2] += 1
+            print("%d/%d"%(val[1],val[2]),end=' ', flush=True)
+            if (val[1]+val[2]) % 5 <1: print()
+        if val[0]<=0: bf=True
+        lock.release()
+        if bf: break
 
 
 if __name__ == "__main__":
@@ -141,9 +149,36 @@ if __name__ == "__main__":
 
     print("Net evaluation started")
     net.eval()
-    win_ratio = evaluate(net, best_net, rounds=EVALUATION_ROUNDS, device=device)
-    print("Net evaluated, win ratio = %.2f" % win_ratio)
-    if win_ratio > BEST_NET_WIN_RATIO:
+    if os.name == 'nt' and args.cuda:
+        cd = torch.device("cpu")
+        net.to(cd)
+        best_net.to(cd)
+        cpuf = True
+    else: cpuf = False
+
+    mp.set_start_method("spawn", force=True)
+    lock = mp.Lock()
+    processes = [];
+    mar = mp.Array('i', 3);
+    mar[0] = 1
+    for i in range(NUM_PROC):
+        p = mp.Process(target=eval, args=(mar, lock, net, best_net, device, cpuf), daemon=True)
+        p.start()
+        processes.append(p)
+    while 1:
+        lock.acquire()
+        if mar[0] > 0 and (mar[1] >= EVALUATION_ROUNDS*BEST_NET_WIN_RATIO or
+                           mar[2]>EVALUATION_ROUNDS*(1-BEST_NET_WIN_RATIO)):
+            mar[0] = 0
+        lock.release()
+        running = any(p.is_alive() for p in processes)
+        if not running:
+            win_ratio = 1 if mar[1] >= EVALUATION_ROUNDS*BEST_NET_WIN_RATIO else 0
+            break
+        time.sleep(0.5)
+    print()
+
+    if win_ratio >= BEST_NET_WIN_RATIO:
         print("Net is better than cur best, sync")
         best_idx += 1
         file_name = os.path.join(saves_path, "best_%d.pth" % (best_idx))
