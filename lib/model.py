@@ -129,7 +129,7 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
         if action not in movel:
             print("Impossible action selected")
         state, won = game.move(state, action, step)
-        if step%3<1: print('.', end='', flush=True)
+        if (best_idx>=0 or value==None) and step%3<1: print('.', end='', flush=True)
         if won>0:
             net1_result = 1 if won == 1 else -1
             result = -net1_result
@@ -140,7 +140,7 @@ def play_game(value, mcts_stores, queue, net1, net2, steps_before_tau_0, mcts_se
             tau = 0
 
     if net1_result !=None:
-        print()
+        if best_idx>=0 or value==None: print()
         if queue is not None:
             dequeuef = isinstance(queue, collections.deque)
             for state, hstep, probs in game_history:
