@@ -10,7 +10,7 @@ self-play.py 스크립트를 실행해 놓는 것만으로 알파 장기의 기�
 ```bash
 python self-play.py --cuda --numproc 3
 ```
-&nbsp;&nbsp; --numproc: 프로세스 갯수 (디폴트=1, 윈도우에서 gpu 사용시 적용 안됨)<br>
+&nbsp;&nbsp; --numproc: 프로세스 갯수 (디폴트=1)<br>
 &nbsp;&nbsp; --cuda: nvidia 그래픽 카드 사용시<br>
 <br>
 human_vs_ai.py는 텍스트 기반으로 인공지능과 대국할 수 있는 프로그램입니다.<br>
