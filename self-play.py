@@ -75,6 +75,7 @@ if __name__ == "__main__":
     step_idx = 0
     mp.set_start_method("spawn", force=True)
     lock = mp.Lock()
+    cpuf = os.name == 'nt' and args.cuda
 
     while True:
         print('checking model')
@@ -103,16 +104,12 @@ if __name__ == "__main__":
             print("wrong model file")
             sys.exit()
         if 'resBlockNum' in checkpoint: model.resBlockNum = checkpoint['resBlockNum']
-        net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
+        net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength)
         net.load_state_dict(checkpoint['model'], strict=False)
         net.eval()
-        net.share_memory()
 
-        if os.name == 'nt' and args.cuda:
-            net.to(torch.device("cpu"))
-            cpuf = True
-        else:
-            cpuf = False
+        if cpuf == False:
+            net.to(device)
 
         processes = []; mar = mp.Array('i', 2); mar[0] = 1
         for i in range(num_proc):
