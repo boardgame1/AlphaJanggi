@@ -15,10 +15,10 @@ Project1 -k self --cuda -t 3
 <br>
 human_vs_ai는 텍스트 기반으로 인공지능과 대국할 수 있는 프로그램입니다.<br>
 ```bash
-Project1 -k human --cuda -m best_1.pth
+Project1 -k human --cuda -m best_1.pt
 ```
 &nbsp;&nbsp; --cuda: nvidia 그래픽 카드 사용시<br>
-&nbsp;&nbsp;  -m (모델 파일 이름): 사용하고자 하는 모델 파일(디폴트 best_model.pth)<br>
+&nbsp;&nbsp;  -m (모델 파일 이름): 사용하고자 하는 모델 파일(디폴트 best_model.pt)<br>
 <br>
 윈도우 실행 파일과 모델 파일은 위 웹 사이트에서 받을 수 있습니다.<br>
 
