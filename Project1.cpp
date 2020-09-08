@@ -184,7 +184,7 @@ void play(int* val, mutex& mtx, torch::jit::script::Module net, int best_idx, st
 		chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 		int a, game_steps;
 		tie(a, game_steps) = model.play_game(val, mcts_store, nullptr, net, net, 20,
-			30, best_idx, SURL, username, device, http);
+			20, best_idx, SURL, username, device, http);
 		chrono::steady_clock::time_point end = chrono::steady_clock::now();
 		float dt = chrono::duration_cast<chrono::milliseconds>(end - begin).count() / 1000.f;
 		float speed_steps = game_steps / dt;
