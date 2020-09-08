@@ -10,7 +10,7 @@
 #else
 	#include <getopt.h>
 #endif
-const char* domain = "alphajanggi.net"; string SURL = "/selfplay11";
+const char* domain = "alphajanggi.net"; string SURL = "/selfplay12";
 
 string piece_str = "초차포마상사졸漢車包馬象士兵";
 void render(string pan_str, int player_human) {
@@ -250,7 +250,7 @@ int main(int argc, char** argv)
 		{ 0, 0, 0, 0 }
 	};
 	bool cudaf = false; int num_thread = 1;
-	string modelfile = "./best_model.pt", modelfile2, kind = "human";
+	string modelfile = "./best_model.pt", modelfile2, kind = "self";
 	while ((opt = getopt_long(argc, argv, "cm:k:n:t:", longopts, nullptr)) != -1)
 	{
 		switch (opt)
@@ -337,7 +337,7 @@ int main(int argc, char** argv)
 				password = password1;
 			}
 			string js = R"({ "username":")" + username + R"(", "password" :")" + password + R"(", "createf" :)" + string(createf ? "true" : "false") + " }";
-			auto result = http->Post("/user11", js, "application/json");
+			auto result = http->Post("/user12", js, "application/json");
 			if(!result || result->status != 200) {
 				cout << "문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.";
 				return 0;
@@ -374,7 +374,7 @@ int main(int argc, char** argv)
 				ofstream myfile; int total = 0;
 				myfile.open(modelfile, ios::out | ios::trunc | ios::binary);
 				if (!myfile.is_open()) cout << "Unable to open file";
-				auto res = http->Get(ur.substr(0, ur.length() - 1).c_str(),
+				auto res = http->Get(ur.c_str(),
 					[&](const char* data, size_t data_length) {
 					myfile.write(data, data_length);
 					bool b = total / 1'000'000 != (total + data_length) / 1'000'000;
