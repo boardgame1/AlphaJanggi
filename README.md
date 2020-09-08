@@ -27,6 +27,6 @@ Project1 -k human --cuda -m best_1.pth
  JetBrains https://www.jetbrains.com/ko-kr : 모든 jetbrains 제품의 1년 라이센스
 
 <h4>사용한 공개 소프트웨어</h4>
- json : https://github.com/nlohmann/json
- http : https://github.com/yhirose/cpp-httplib
- dirichlet : https://github.com/gcant/dirichlet-cpp
+ json : https://github.com/nlohmann/json <br>
+ http : https://github.com/yhirose/cpp-httplib <br>
+ dirichlet : https://github.com/gcant/dirichlet-cpp <br>
