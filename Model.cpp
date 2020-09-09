@@ -40,6 +40,7 @@ tuple<int, int> Model::play_game(int* value, MCTS* mcts, MCTS* mcts2, torch::jit
     }
     else if (mcts2 == nullptr)
         mcts2 = mcts;
+    mcts->clear(); mcts2->clear();
     array<MCTS*, 2> mcts_stores = { mcts,mcts2 };
 
     string state = encode_lists(pani, 0);
@@ -52,7 +53,6 @@ tuple<int, int> Model::play_game(int* value, MCTS* mcts, MCTS* mcts2, torch::jit
     int net1_result = 9;
 
     while (net1_result > 5 && (value==nullptr || value[0]>0)) {
-        mcts_stores[cur_player]->clear();
         mcts_stores[cur_player]->search_batch(mcts_searches, state,
             cur_player, nets[cur_player], step, device);
         vector<int> const movel = possible_moves(state, cur_player, step);
