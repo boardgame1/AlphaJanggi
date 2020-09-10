@@ -31,17 +31,16 @@ torch::jit::IValue Model::state_lists_to_batch(vector<string> state_lists, vecto
     return t;
 }
 
-tuple<int, int> Model::play_game(int* value, MCTS* mcts, MCTS* mcts2, torch::jit::script::Module const net1,
+tuple<int, int> Model::play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<MCTS> mcts2, torch::jit::script::Module const net1,
     torch::jit::script::Module const net2, int steps_before_tau_0, int const mcts_searches, int best_idx,
     string url, string uname, torch::Device device, httplib::Client* http) {
-    int createf= 0;
     if (mcts == nullptr) {
-        mcts = new MCTS(); mcts2 = new MCTS(); createf = true;
+        mcts = make_shared<MCTS>(); mcts2 = make_shared<MCTS>();
     }
     else if (mcts2 == nullptr)
         mcts2 = mcts;
     mcts->clear(); mcts2->clear();
-    array<MCTS*, 2> mcts_stores = { mcts,mcts2 };
+    array<shared_ptr<MCTS>, 2> mcts_stores = { mcts,mcts2 };
 
     string state = encode_lists(pani, 0);
     vector<torch::jit::script::Module> nets = { net1, net2 };
@@ -53,6 +52,9 @@ tuple<int, int> Model::play_game(int* value, MCTS* mcts, MCTS* mcts2, torch::jit
     int net1_result = 9;
 
     while (net1_result > 5 && (value==nullptr || value[0]>0)) {
+#ifdef _WIN32
+        mcts_stores[cur_player]->clear();
+#endif
         mcts_stores[cur_player]->search_batch(mcts_searches, state,
             cur_player, nets[cur_player], step, device);
         vector<int> const movel = possible_moves(state, cur_player, step);
@@ -78,7 +80,6 @@ tuple<int, int> Model::play_game(int* value, MCTS* mcts, MCTS* mcts2, torch::jit
         if (step >= steps_before_tau_0)
             tau = 0;
     }
-    if (createf) { delete mcts; delete mcts2; }
 
     if (net1_result < 5) {
         if (best_idx >= 0 || value == nullptr) cout << endl;

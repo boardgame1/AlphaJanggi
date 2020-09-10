@@ -177,7 +177,7 @@ void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::
 
 void play(int* val, mutex& mtx, torch::jit::script::Module net, int best_idx, string username, torch::Device device,
 	int step_idx, int *done, httplib::Client* http) {
-	MCTS* mcts_store = new MCTS();
+	shared_ptr<MCTS> mcts_store = make_shared<MCTS>();
 	while (1) {
 		chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 		int a, game_steps;
@@ -200,7 +200,6 @@ void play(int* val, mutex& mtx, torch::jit::script::Module net, int best_idx, st
 			*done = 1; break;
 		}
 	}
-	delete mcts_store;
 }
 
 #ifndef _WIN32
