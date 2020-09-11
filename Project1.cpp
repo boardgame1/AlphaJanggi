@@ -8,7 +8,7 @@
 #else
 	#include <getopt.h>
 #endif
-const char* domain = "alphajanggi.net"; string SURL = "/selfplay12";
+const char* domain = "alphajanggi.net"; string SURL = "/selfplay13";
 
 string piece_str = "초차포마상사졸漢車包馬象士兵";
 void render(string pan_str, int player_human) {
@@ -32,7 +32,7 @@ void render(string pan_str, int player_human) {
 
 string masang[] = { "마상마상", "상마상마", "마상상마", "상마마상" };
 int mcts_searches = 60;
-const int LEVELC = 160;
+const int LEVELC = 100;
 int pani[10][9] = { {2, 0, 0, 6, 0, 6, 0, 0, 2}, {0, 0, 0, 0, 1, 0, 0, 0, 0}, {0, 3, 0, 0, 0, 0, 0, 3, 0}, {7, 0, 7, 0, 7, 0, 7, 0, 7},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0}, {17, 0, 17, 0, 17, 0, 17, 0, 17}, {0, 13, 0, 0, 0, 0, 0, 13, 0},
 	{0, 0, 0, 0, 11, 0, 0, 0, 0}, {12, 0, 0, 16, 0, 16, 0, 0, 12} };
@@ -182,7 +182,7 @@ void play(int* val, mutex& mtx, torch::jit::script::Module net, int best_idx, st
 		chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 		int a, game_steps;
 		tie(a, game_steps) = model.play_game(val, mcts_store, nullptr, net, net, 20,
-			20, best_idx, SURL, username, device, http);
+			8, best_idx, SURL, username, device, http);
 		chrono::steady_clock::time_point end = chrono::steady_clock::now();
 		float dt = chrono::duration_cast<chrono::milliseconds>(end - begin).count() / 1000.f;
 		float speed_steps = game_steps / dt;
@@ -247,7 +247,7 @@ int main(int argc, char** argv)
 		{ 0, 0, 0, 0 }
 	};
 	bool cudaf = false; int num_thread = 1;
-	string modelfile = "./best_model.pt", modelfile2, kind = "self";
+	string modelfile = "./best_model.pt", modelfile2, kind = "human";
 	while ((opt = getopt_long(argc, argv, "cm:k:n:t:", longopts, nullptr)) != -1)
 	{
 		switch (opt)
@@ -294,10 +294,10 @@ int main(int argc, char** argv)
 		}
 		for (int k = 0; k < 2; k++) {
 			int wins = 0, losses = 0, draws = 0;
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 50; i++) {
 				int r, a;
 				tie(r, a) = model.play_game(nullptr, nullptr, nullptr, k < 1 ? net : net2, k < 1 ? net2 : net,
-					MAX_TURN, 50, -1, "", "", device, nullptr);
+					MAX_TURN, 1, -1, "", "", device, nullptr);
 				cout << r << endl;
 				if (r > 0)
 					wins++;
@@ -334,7 +334,7 @@ int main(int argc, char** argv)
 				password = password1;
 			}
 			string js = R"({ "username":")" + username + R"(", "password" :")" + password + R"(", "createf" :)" + string(createf ? "true" : "false") + " }";
-			auto result = http->Post("/user12", js, "application/json");
+			auto result = http->Post("/user13", js, "application/json");
 			if(!result || result->status != 200) {
 				cout << "문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.";
 				return 0;
