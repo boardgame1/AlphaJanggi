@@ -108,7 +108,7 @@ class MCTS:
                     self.value[state_int][action] / self.visit_count[state_int][action]
                 cur_value = -cur_value
 
-    def get_policy_value(self, state_int, movel, cur_player, tau=1):
+    def get_policy_value(self, state_int, movel, tau=1):
         counts = [0] * actionTable.AllMoveLength
         for m in movel:
             idx = actionTable.moveDict[m]
