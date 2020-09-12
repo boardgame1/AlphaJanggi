@@ -51,7 +51,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model", help="Model to load")
     parser.add_argument("-tm", "--tmodel", help="Temp model")
     args = parser.parse_args()
-    device = torch.device("cuda" if args.cuda else "cpu")
+    device = torch.device("cuda:1" if args.cuda else "cpu")
 
     saves_path = "saves"
     os.makedirs(saves_path, exist_ok=True)
@@ -131,12 +131,12 @@ if __name__ == "__main__":
             optimizer.step()
     f.close()
 
-    if args.inc==False and (args.tmodel==None or args.tmodel.find('_a.')<0):
+    if args.tmodel==None or args.tmodel.find('_a.')<0:
         cn=0
         if args.tmodel:
             f=open('./count.txt', 'r'); s=f.readline(); cn=int(s); f.close()
         f = open('./count.txt', 'w'); cn+=step_idx; f.write(str(cn)+'\n'); f.close()
-    fns = args.tmodel if args.tmodel else "best_%d%s.pth" % (best_idx, '_a' if args.inc else '')
+    fns = args.tmodel if args.tmodel else "best_%d.pth" % (best_idx)
     file_name = os.path.join('.', fns)
     torch.save({'model': net.state_dict(), 'best_idx': best_idx,
                 'opt': optimizer.state_dict()}, file_name)
