@@ -70,7 +70,7 @@ tuple<int, int> Model::play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<M
         //if (find(movel.begin(), movel.end(), action) == movel.end())
         //    cout << "Impossible action selected" << endl;
         int won; tie(state, won) = move(state, action, step);
-        if ((best_idx>=0 || value==nullptr) && step % 3 < 1) cout << "." << flush;
+        if ((best_idx>=0 || value==nullptr) && step % 3 < 1) cout << ".";
         if (won > 0) {
             net1_result = won == 1 ? 1 : -1;
             break;
@@ -99,7 +99,9 @@ tuple<int, int> Model::play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<M
             js["netIdx"] = best_idx; js["result"] = net1_result; js["username"] = uname; js["action"] = gh;
             string jss = js.dump();
             auto res = http->Post(url.c_str(), jss, "application/json");
-            if (!res || res->status != 200) cout << "error occured0" << endl;
+            if (!res || res->status != 200) {
+                cout << "error occured0" << endl; serrn++;
+            }
             else {
                 json hr = json::parse(res->body);
                 if (hr["status"] == "error") cout << "error occured" << endl;

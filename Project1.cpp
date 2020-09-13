@@ -235,6 +235,7 @@ string getpasswd() {
 	return password1;
 }
 
+int serrn;
 int main(int argc, char** argv)
 {
 	int opt;
@@ -391,6 +392,7 @@ int main(int argc, char** argv)
 			net.to(device);
 			net.train(false);
 
+			serrn = 0;
 			vector<thread>	processes; int* mar = new int[2]; int* done=new int[num_thread]; mar[0] = 1; mar[1] = 0;
 			for (int i = 0; i < num_thread; i++) {
 				done[i] = 0;
@@ -409,7 +411,9 @@ int main(int argc, char** argv)
 			for (int i = 0; i < processes.size();i++) processes[i].join();
 			step_idx += mar[1]; delete[] mar, done;
 			cout << endl;
-			delete http; http = new httplib::Client(domain);
+			delete http;
+			if (serrn > 20 * num_thread) break;;
+			http = new httplib::Client(domain);
 		}
 	}
 }
