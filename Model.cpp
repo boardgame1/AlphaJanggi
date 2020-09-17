@@ -31,6 +31,23 @@ torch::jit::IValue Model::state_lists_to_batch(vector<string> state_lists, vecto
     return t;
 }
 
+string toutf8(string codepage_str) {
+    int size = MultiByteToWideChar(CP_ACP, MB_COMPOSITE, codepage_str.c_str(),
+        codepage_str.length(), nullptr, 0);
+    std::wstring utf16_str(size, '\0');
+    MultiByteToWideChar(CP_ACP, MB_COMPOSITE, codepage_str.c_str(),
+        codepage_str.length(), &utf16_str[0], size);
+
+    int utf8_size = WideCharToMultiByte(CP_UTF8, 0, utf16_str.c_str(),
+        utf16_str.length(), nullptr, 0,
+        nullptr, nullptr);
+    std::string utf8_str(utf8_size, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, utf16_str.c_str(),
+        utf16_str.length(), &utf8_str[0], utf8_size,
+        nullptr, nullptr);
+    return utf8_str;
+}
+
 tuple<int, int> Model::play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<MCTS> mcts2, torch::jit::script::Module const net1,
     torch::jit::script::Module const net2, int steps_before_tau_0, int const mcts_searches, int best_idx,
     string url, string uname, torch::Device device, httplib::Client* http) {
@@ -96,7 +113,7 @@ tuple<int, int> Model::play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<M
                 gh.emplace_back(make_tuple(action, prar));
             }
             json js;
-            js["netIdx"] = best_idx; js["result"] = net1_result; js["username"] = uname; js["action"] = gh;
+            js["action"] = gh; js["netIdx"] = best_idx; js["result"] = net1_result; js["username"] = toutf8(uname);
             string jss = js.dump();
             auto res = http->Post(url.c_str(), jss, "application/json");
             if (!res || res->status != 200) {
