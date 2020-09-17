@@ -33,7 +33,7 @@ using json = nlohmann::json;
 enum { KING = 1, CHA, PO, MA, SANG, SA, ZOL };
 
 void actionTable(); string encode_lists(int pan[][9], int step);
-void decode_binary(int pan[][9], string state_str);
+void decode_binary(int pan[][9], string state_str); string toutf8(string codepage_str);
 vector<int> possible_moves(string pan_str, int player, int step);
 tuple<string, int> move(string pan_str, int move, int step);
 

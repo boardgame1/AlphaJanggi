@@ -295,10 +295,10 @@ int main(int argc, char** argv)
 		}
 		for (int k = 0; k < 2; k++) {
 			int wins = 0, losses = 0, draws = 0;
-			for (int i = 0; i < 50; i++) {
+			for (int i = 0; i < 10; i++) {
 				int r, a;
 				tie(r, a) = model.play_game(nullptr, nullptr, nullptr, k < 1 ? net : net2, k < 1 ? net2 : net,
-					MAX_TURN, 1, -1, "", "", device, nullptr);
+					MAX_TURN, 20, -1, "", "", device, nullptr);
 				cout << r << endl;
 				if (r > 0)
 					wins++;
@@ -334,6 +334,7 @@ int main(int argc, char** argv)
 				if (password1.empty()) continue;
 				password = password1;
 			}
+			username = toutf8(username);
 			string js = R"({ "username":")" + username + R"(", "password" :")" + password + R"(", "createf" :)" + string(createf ? "true" : "false") + " }";
 			auto result = http->Post("/user14", js, "application/json");
 			if(!result || result->status != 200) {

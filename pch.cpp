@@ -2,8 +2,6 @@
 
 #include "pch.h"
 
-// 미리 컴파일된 헤더를 사용하는 경우 컴파일이 성공하려면 이 소스 파일이 필요합니다.
-
 int moveTable[AllMoveLength];
 unordered_map<int, int> moveDict;
 
@@ -208,4 +206,20 @@ tuple<string, int> move(string pan_str, int move, int step) {
 
 	return make_tuple( encode_lists(pan, step + 1), captured % 10 == KING && piece % 10 != KING ? 2 - captured / 10 :
 		step < MAX_TURN - 1 && captured % 10 != KING ? 0 : _endWin(pan) );
+}
+string toutf8(string codepage_str) {
+	int size = MultiByteToWideChar(CP_ACP, MB_COMPOSITE, codepage_str.c_str(),
+		codepage_str.length(), nullptr, 0);
+	std::wstring utf16_str(size, '\0');
+	MultiByteToWideChar(CP_ACP, MB_COMPOSITE, codepage_str.c_str(),
+		codepage_str.length(), &utf16_str[0], size);
+
+	int utf8_size = WideCharToMultiByte(CP_UTF8, 0, utf16_str.c_str(),
+		utf16_str.length(), nullptr, 0,
+		nullptr, nullptr);
+	std::string utf8_str(utf8_size, '\0');
+	WideCharToMultiByte(CP_UTF8, 0, utf16_str.c_str(),
+		utf16_str.length(), &utf8_str[0], utf8_size,
+		nullptr, nullptr);
+	return utf8_str;
 }
