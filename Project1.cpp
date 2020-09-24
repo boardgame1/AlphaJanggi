@@ -8,6 +8,16 @@
 #else
 	#include <getopt.h>
 #endif
+
+#define LEARNING_RATE  0.1
+#define REPLAY_BUFFER  30000
+#define PLAY_EPISODES  25
+#define MIN_REPLAY_TO_TRAIN  10000
+#define TRAIN_ROUNDS  50
+#define BEST_NET_WIN_RATIO  0.545
+#define NUM_PROC  5
+#define EVALUATION_ROUNDS  10
+
 const char* domain = "alphajanggi.net"; string SURL = "/selfplay14";
 
 string piece_str = "초차포마상사졸漢車包馬象士兵";
@@ -120,7 +130,7 @@ void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::
 		}
 		else {
 			mctsi.clear();
-			mctsi.search_batch(mcts_searches, pan, cur_player, net1, step, device);
+			mctsi.search_batch(mcts_searches, pan, cur_player, &net1, step, device);
 			array<float, AllMoveLength> probs, values;
 			tie(probs, values) = mctsi.get_policy_value(pan, movelist);
 			int n;
@@ -175,14 +185,14 @@ void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::
 	}
 }
 
-void play(int* val, mutex& mtx, torch::jit::script::Module net, int best_idx, string username, torch::Device device,
+void play(int* val, mutex& mtx, torch::jit::script::Module& net, int best_idx, string username, torch::Device device,
 	int step_idx, int *done, httplib::Client* http) {
 	shared_ptr<MCTS> mcts_store = make_shared<MCTS>();
 	while (1) {
 		chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 		int a, game_steps;
-		tie(a, game_steps) = model.play_game(val, mcts_store, nullptr, net, net, 20,
-			20, best_idx, SURL, username, device, http);
+		tie(a, game_steps) = play_game(val, mcts_store, nullptr, &net, &net, 20,
+			8, best_idx, SURL, username, device, http);
 		chrono::steady_clock::time_point end = chrono::steady_clock::now();
 		float dt = chrono::duration_cast<chrono::milliseconds>(end - begin).count() / 1000.f;
 		float speed_steps = game_steps / dt;
@@ -267,7 +277,7 @@ int main(int argc, char** argv)
 
 	actionTable();
 	torch::jit::script::Module net;
-	if (kind != "self") {
+	if (kind == "human" || kind == "ai") {
 		ifstream f(modelfile.c_str());
 		if (f.good()) {
 			net = torch::jit::load(modelfile);
@@ -297,7 +307,7 @@ int main(int argc, char** argv)
 			int wins = 0, losses = 0, draws = 0;
 			for (int i = 0; i < 10; i++) {
 				int r, a;
-				tie(r, a) = model.play_game(nullptr, nullptr, nullptr, k < 1 ? net : net2, k < 1 ? net2 : net,
+				tie(r, a) = play_game(nullptr, nullptr, nullptr, k < 1 ? &net : &net2, k < 1 ? &net2 : &net,
 					MAX_TURN, 20, -1, "", "", device, nullptr);
 				cout << r << endl;
 				if (r > 0)
@@ -397,7 +407,7 @@ int main(int argc, char** argv)
 			vector<thread>	processes; int* mar = new int[2]; int* done=new int[num_thread]; mar[0] = 1; mar[1] = 0;
 			for (int i = 0; i < num_thread; i++) {
 				done[i] = 0;
-				processes.emplace_back(thread(play, mar, ref(mtx), net, best_idx, username, device,
+				processes.emplace_back(thread(play, mar, ref(mtx), ref(net), best_idx, username, device,
 					step_idx, &done[i], http));
 			}
 			while (1) {

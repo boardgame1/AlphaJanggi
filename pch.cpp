@@ -207,7 +207,9 @@ tuple<string, int> move(string pan_str, int move, int step) {
 	return make_tuple( encode_lists(pan, step + 1), captured % 10 == KING && piece % 10 != KING ? 2 - captured / 10 :
 		step < MAX_TURN - 1 && captured % 10 != KING ? 0 : _endWin(pan) );
 }
+
 string toutf8(string codepage_str) {
+#ifdef _WIN32
 	int size = MultiByteToWideChar(CP_ACP, MB_COMPOSITE, codepage_str.c_str(),
 		codepage_str.length(), nullptr, 0);
 	std::wstring utf16_str(size, '\0');
@@ -222,4 +224,7 @@ string toutf8(string codepage_str) {
 		utf16_str.length(), &utf8_str[0], utf8_size,
 		nullptr, nullptr);
 	return utf8_str;
+#else
+	return codepage_str;
+#endif
 }

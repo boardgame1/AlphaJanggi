@@ -1,7 +1,6 @@
 #include "pch.h"
-#include "Model.h"
 
-void Model::_encode_list_state(float dest_np[][10][9], int state_list[][9], int step) {
+void _encode_list_state(float dest_np[][10][9], int state_list[][9], int step) {
     int who_move = step % 2;
     for (int row_idx=0;row_idx<10;row_idx++)
         for (int col_idx = 0; col_idx < 9; col_idx++) {
@@ -18,7 +17,7 @@ void Model::_encode_list_state(float dest_np[][10][9], int state_list[][9], int 
     if (who_move > 0) dest_np[14][9][0] = 1.0f;
 }
 
-torch::jit::IValue Model::state_lists_to_batch(vector<string> state_lists, vector<int> steps_lists, torch::Device device) const {
+torch::jit::IValue state_lists_to_batch(const vector<string>& state_lists, const vector<int>& steps_lists, torch::Device device) {
     const int batch_size = state_lists.size();
     float batch[BATCH_SIZE][15][10][9] = { 0, };
     for (int idx = 0; idx < batch_size; idx++) {
@@ -31,8 +30,8 @@ torch::jit::IValue Model::state_lists_to_batch(vector<string> state_lists, vecto
     return t;
 }
 
-tuple<int, int> Model::play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<MCTS> mcts2, torch::jit::script::Module const net1,
-    torch::jit::script::Module const net2, int steps_before_tau_0, int const mcts_searches, int best_idx,
+tuple<int, int> play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<MCTS> mcts2, torch::jit::script::Module* const net1,
+    torch::jit::script::Module* const net2, int steps_before_tau_0, int const mcts_searches, int best_idx,
     string url, string uname, torch::Device device, httplib::Client* http) {
     if (mcts == nullptr) {
         mcts = make_shared<MCTS>(); mcts2 = make_shared<MCTS>();
@@ -43,7 +42,7 @@ tuple<int, int> Model::play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<M
     array<shared_ptr<MCTS>, 2> mcts_stores = { mcts,mcts2 };
 
     string state = encode_lists(pani, 0);
-    vector<torch::jit::script::Module> nets = { net1, net2 };
+    vector<torch::jit::script::Module*> nets = { net1, net2 };
     int cur_player = 0;
     int step = 0;
     float tau = steps_before_tau_0 > 0 ? 1 : 0;

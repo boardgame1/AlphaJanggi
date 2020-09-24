@@ -7,7 +7,6 @@ MCTS::MCTS()
     c_puct = 1;
 }
 
-Model model;
 random_device rd;
 mt19937 rdgen(rd());
 uniform_real_distribution<float> urd(0, 1);
@@ -71,12 +70,12 @@ bool MCTS::is_leaf(string& state_int) {
     return sprobs.find(state_int) == sprobs.end();
 }
 
-void MCTS::search_batch(int count, string& state_int, int player, torch::jit::script::Module net, int step, torch::Device device) {
+void MCTS::search_batch(int count, string& state_int, int player, torch::jit::script::Module* net, int step, torch::Device device) {
     for (int i = 0; i < count; i++)
         search_minibatch(state_int, player, net, step, device);
 }
 
-void MCTS::search_minibatch(string& state_int, int player, torch::jit::script::Module net, int step, torch::Device device) {
+void MCTS::search_minibatch(string& state_int, int player, torch::jit::script::Module* net, int step, torch::Device device) {
     vector<tuple<float, vector<string>, vector<int>>> backup_queue;
     vector<string> expand_states;
     vector<int> expand_steps;
@@ -95,9 +94,9 @@ void MCTS::search_minibatch(string& state_int, int player, torch::jit::script::M
         }
     }
     if (!expand_queue.empty()) {
-        auto batch_v = model.state_lists_to_batch(expand_states, expand_steps, device);
+        auto batch_v = state_lists_to_batch(expand_states, expand_steps, device);
         vector<torch::jit::IValue> vt; vt.push_back(batch_v);
-        auto t = net.forward(vt);
+        auto t = net->forward(vt);
         at::Tensor logits_v = t.toTuple()->elements()[0].toTensor(), values_v = t.toTuple()->elements()[1].toTensor();
         at::Tensor probs_v = torch::nn::functional::softmax(logits_v, torch::nn::functional::SoftmaxFuncOptions(1));
         auto values = values_v.data().to(torch::kCPU);
@@ -134,7 +133,7 @@ void MCTS::search_minibatch(string& state_int, int player, torch::jit::script::M
     }
 }
 
-tuple<array<float, AllMoveLength>, array<float, AllMoveLength>> MCTS::get_policy_value(const string &state_int, vector<int> movel, float tau) {
+tuple<array<float, AllMoveLength>, array<float, AllMoveLength>> MCTS::get_policy_value(const string &state_int, const vector<int>& movel, float tau) {
     array<int, AllMoveLength> counts; fill(counts.begin(), counts.end(), 0);
     for (int m : movel) {
         int idx = moveDict[m];

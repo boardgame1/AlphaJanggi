@@ -40,6 +40,6 @@ tuple<string, int> move(string pan_str, int move, int step);
 
 extern int moveTable[], serrn; extern unordered_map<int, int> moveDict;
 extern mt19937 rdgen; extern int pani[10][9]; extern uniform_real_distribution<float> urd;
-extern Model model;
+extern random_device rd;
 
 #endif //PCH_H
