@@ -9,15 +9,6 @@
 	#include <getopt.h>
 #endif
 
-#define LEARNING_RATE  0.1
-#define REPLAY_BUFFER  30000
-#define PLAY_EPISODES  25
-#define MIN_REPLAY_TO_TRAIN  10000
-#define TRAIN_ROUNDS  50
-#define BEST_NET_WIN_RATIO  0.545
-#define NUM_PROC  5
-#define EVALUATION_ROUNDS  10
-
 const char* domain = "alphajanggi.net"; string SURL = "/selfplay14";
 
 string piece_str = "초차포마상사졸漢車包馬象士兵";
@@ -192,7 +183,7 @@ void play(int* val, mutex& mtx, torch::jit::script::Module& net, int best_idx, s
 		chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 		int a, game_steps;
 		tie(a, game_steps) = play_game(val, mcts_store, nullptr, &net, &net, 20,
-			8, best_idx, SURL, username, device, http);
+			20, best_idx, SURL, username, device, http);
 		chrono::steady_clock::time_point end = chrono::steady_clock::now();
 		float dt = chrono::duration_cast<chrono::milliseconds>(end - begin).count() / 1000.f;
 		float speed_steps = game_steps / dt;
