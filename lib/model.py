@@ -7,7 +7,7 @@ import torch.nn as nn
 from lib import game, mcts, webFunction, actionTable
 
 
-NUM_FILTERS = 128
+NUM_FILTERS = 192
 OBS_SHAPE = (15, game.GAME_ROWS, game.GAME_COLS)
 
 class Net(nn.Module):
@@ -96,8 +96,8 @@ class Net(nn.Module):
         )
 
         self.conv_policy = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, 32, kernel_size=1),
-            nn.BatchNorm2d(32),
+            nn.Conv2d(NUM_FILTERS, 4, kernel_size=1),
+            nn.BatchNorm2d(4),
             nn.LeakyReLU()
         )
         conv_policy_size = self._get_conv_policy_size(body_out_shape)
