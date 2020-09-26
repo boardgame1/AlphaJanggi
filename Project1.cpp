@@ -344,7 +344,7 @@ int main(int argc, char** argv)
 			}
 			auto hd = result->headers;
 			for (auto nc : hd) {
-				if (nc.first == "Set-Cookie" && nc.second.substr(0, 5) == "name=") cookie = nc.second;
+				if (nc.first == "Set-Cookie") cookie = nc.second;
 			}
 			json hr = json::parse(result->body);
 			if (hr["status"] == "ok") break;
