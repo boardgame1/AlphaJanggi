@@ -9,7 +9,7 @@
 	#include <getopt.h>
 #endif
 
-const char* domain = "alphajanggi.net"; string SURL = "/selfplay14";
+const char* domain = "alphajanggi.net"; const char* UURL = "/user15";
 
 string piece_str = "초차포마상사졸漢車包馬象士兵";
 void render(string pan_str, int player_human) {
@@ -176,14 +176,14 @@ void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::
 	}
 }
 
-void play(int* val, mutex& mtx, torch::jit::script::Module& net, int best_idx, string username, torch::Device device,
-	int step_idx, int *done, httplib::Client* http) {
+void play(int* val, mutex& mtx, torch::jit::script::Module& net, int best_idx, torch::Device device,
+	int step_idx, int *done, httplib::Client* http, string& cookie) {
 	shared_ptr<MCTS> mcts_store = make_shared<MCTS>();
 	while (1) {
 		chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 		int a, game_steps;
 		tie(a, game_steps) = play_game(val, mcts_store, nullptr, &net, &net, 20,
-			20, best_idx, SURL, username, device, http);
+			20, best_idx, "/selfplay15", cookie, device, http);
 		chrono::steady_clock::time_point end = chrono::steady_clock::now();
 		float dt = chrono::duration_cast<chrono::milliseconds>(end - begin).count() / 1000.f;
 		float speed_steps = game_steps / dt;
@@ -314,7 +314,7 @@ int main(int argc, char** argv)
 		}
 	}else if(kind == "self") {
 		httplib::Client *http = new httplib::Client(domain);
-		string username, password;
+		string username, password, cookie;
 		while (1) {
 			bool createf = false;
 			cout << "user ID (to create, enter 0): "; getline(cin, username);
@@ -337,10 +337,14 @@ int main(int argc, char** argv)
 			}
 			username = toutf8(username);
 			string js = R"({ "username":")" + username + R"(", "password" :")" + password + R"(", "createf" :)" + string(createf ? "true" : "false") + " }";
-			auto result = http->Post("/user14", js, "application/json");
+			auto result = http->Post(UURL, js, "application/json");
 			if(!result || result->status != 200) {
 				cout << "문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.";
 				return 0;
+			}
+			auto hd = result->headers;
+			for (auto nc : hd) {
+				if (nc.first == "Set-Cookie" && nc.second.substr(0, 5) == "name=") cookie = nc.second;
 			}
 			json hr = json::parse(result->body);
 			if (hr["status"] == "ok") break;
@@ -398,8 +402,8 @@ int main(int argc, char** argv)
 			vector<thread>	processes; int* mar = new int[2]; int* done=new int[num_thread]; mar[0] = 1; mar[1] = 0;
 			for (int i = 0; i < num_thread; i++) {
 				done[i] = 0;
-				processes.emplace_back(thread(play, mar, ref(mtx), ref(net), best_idx, username, device,
-					step_idx, &done[i], http));
+				processes.emplace_back(thread(play, mar, ref(mtx), ref(net), best_idx, device,
+					step_idx, &done[i], http, ref(cookie)));
 			}
 			while (1) {
 				chrono::milliseconds timespan(500); this_thread::sleep_for(timespan);
