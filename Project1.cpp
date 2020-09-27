@@ -176,6 +176,14 @@ void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::
 	}
 }
 
+string getCookie(httplib::Result result) {
+	string cookie;
+	auto hd = result->headers;
+	for (auto nc : hd)
+		if (nc.first == "Set-Cookie") cookie = nc.second;
+	return cookie;
+}
+
 void play(int* val, mutex& mtx, torch::jit::script::Module& net, int best_idx, torch::Device device,
 	int step_idx, int *done, httplib::Client* http, string& cookie) {
 	shared_ptr<MCTS> mcts_store = make_shared<MCTS>();
@@ -342,10 +350,7 @@ int main(int argc, char** argv)
 				cout << "문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.";
 				return 0;
 			}
-			auto hd = result->headers;
-			for (auto nc : hd) {
-				if (nc.first == "Set-Cookie") cookie = nc.second;
-			}
+			cookie = getCookie(result);
 			json hr = json::parse(result->body);
 			if (hr["status"] == "ok") break;
 			if (hr["status"] == "dup") {
@@ -420,6 +425,11 @@ int main(int argc, char** argv)
 			delete http;
 			if (serrn > 20 * num_thread) break;;
 			http = new httplib::Client(domain);
+			string js = R"({ "username":")" + username + R"(", "password" :")" + password + R"(", "createf" :false })";
+			auto result = http->Post(UURL, js, "application/json");
+			if (!result || result->status != 200)
+				cout << "문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.";
+			else cookie = getCookie(result);
 		}
 	}
 }
