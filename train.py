@@ -31,7 +31,7 @@ def eval(val, lock, net1, net2, device, cpuf):
     while True:
         are = random.randrange(0, 2)
         r, _ = model.play_game(val, mcts_stores, None, net1=net1 if are<1 else net2,
-                net2=net2 if are<1 else net1, steps_before_tau_0=0,
+                net2=net2 if are<1 else net1, steps_before_tau_0=20,
                             mcts_searches=40, mcts_batch_size=40, best_idx=-1, device=device)
 
         bf = False
