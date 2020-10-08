@@ -12,32 +12,28 @@ void actionTable()
 
     for (int m1 = 0; m1 < 58; m1++) {
         for (int n1 = 0; n1 < 10; n1++) {
-            for (int l1 = 0; l1 < 9; l1++) {
-                int src = n1 * 9 + l1, x, y;
-                if (m1 < 9) { y = n1 - (m1 + 1); x = l1; }
-                else if (m1 < 18) {
-                    y = n1 + (m1 - 8); x = l1;
-                }
-                else if (m1 < 26) { y = n1; x = l1 - (m1 - 17); }
-                else if (m1 < 34) { y = n1; x = l1 + m1 - 25; }
-                else if (m1 < 50) {
-                    y = n1 + ms[m1 - 34][0]; x = l1 + ms[m1 - 34][1];
-                }
-                else if (m1 < 52) {
-                    y = n1 - (m1 - 49); x = l1 + (m1 - 49);
-                }
-                else if (m1 < 54) {
-                    y = n1 + (m1 - 51); x = l1 + (m1 - 51);
-                }
-                else if (m1 < 56) {
-                    y = n1 + (m1 - 53); x = l1 - (m1 - 53);
-                }
-                else {
-                    y = n1 - (m1 - 55); x = l1 - (m1 - 55);
-                }
-                int k = m1 * 90 + n1 * 9 + l1;
-                moveTable[k] = y >= 0 && y < 10 && x >= 0 && x < 9 ? src * 100 + y * 9 + x : -1;
-            }
+			for (int l1 = 0; l1 < 9; l1++) {
+				int src = n1 * 9 + l1, x, y;
+				if (m1 < 9) { y = n1 - (m1 + 1); x = l1; }
+				else if (m1 < 18) {
+					y = n1 + (m1 - 8); x = l1;
+				}
+				else if (m1 < 26) { y = n1; x = l1 - (m1 - 17); }
+				else if (m1 < 34) { y = n1; x = l1 + m1 - 25; }
+				else if (m1 < 50) {
+					y = n1 + ms[m1 - 34][0]; x = l1 + ms[m1 - 34][1];
+				}
+				else {
+					if ((n1 < 3 || n1>6) && l1 > 2 && l1 < 6 && src % 2 == 1 - n1 / 5) {
+						int k = (m1 - 50) % 2 + 1, a1 = m1 < 52 || m1>55 ? -1 : 1, a2 = m1 < 54 ? 1 : -1;
+						y = n1 + k * a1; x = l1 + k * a2;
+						if ((y > 2 && y < 7) || x < 3 || x>5) y = -1;
+					}
+					else y = -1;
+				}
+				int k = m1 * 90 + n1 * 9 + l1;
+				moveTable[k] = y >= 0 && y < 10 && x >= 0 && x < 9 ? src * 100 + y * 9 + x : -1;
+			}
         }
     }
     moveTable[5220]=0;
@@ -45,8 +41,7 @@ void actionTable()
     moveTable[5222] = 10001;
     moveTable[5223] = 10002;
     moveTable[5224] = 10003;
-	for(int k=0;k<5225;k++)
-	    if (moveTable[k] >= 0) moveDict.insert(pair<int, int>(moveTable[k], k));
+	for(int k=0;k<5225;k++)	if (moveTable[k] >= 0) moveDict.insert(pair<int, int>(moveTable[k], k));
 }
 
 string encode_lists(int pan[][9], int step) {

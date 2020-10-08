@@ -32,7 +32,7 @@ torch::jit::IValue state_lists_to_batch(const vector<string>& state_lists, const
 
 tuple<int, int> play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<MCTS> mcts2, torch::jit::script::Module* const net1,
     torch::jit::script::Module* const net2, int steps_before_tau_0, int const mcts_searches, int best_idx,
-    string url, string cookie, torch::Device device, httplib::Client* http) {
+    string url, string username, torch::Device device, httplib::Client* http) {
     if (mcts == nullptr) {
         mcts = make_shared<MCTS>(); mcts2 = make_shared<MCTS>();
     }
@@ -95,10 +95,9 @@ tuple<int, int> play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<MCTS> mc
                 gh.emplace_back(make_tuple(action, prar));
             }
             json js;
-            js["action"] = gh; js["netIdx"] = best_idx; js["result"] = net1_result;
+            js["action"] = gh; js["netIdx"] = best_idx; js["result"] = net1_result; js["username"] = username;
             string jss = js.dump();
-            httplib::Headers hd; hd.insert(pair<string,string>("Cookie",cookie));
-            auto res = http->Post(url.c_str(), hd, jss, "application/json");
+            auto res = http->Post(url.c_str(), jss, "application/json");
             if (!res || res->status != 200) {
                 cout << "error occured0" << endl; serrn++;
             }

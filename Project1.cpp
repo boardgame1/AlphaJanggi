@@ -9,7 +9,7 @@
 	#include <getopt.h>
 #endif
 
-const char* domain = "alphajanggi.net"; const char* UURL = "/user15";
+const char* domain = "alphajanggi.net"; const char* UURL = "/user16";
 
 string piece_str = "초차포마상사졸漢車包馬象士兵";
 void render(string pan_str, int player_human) {
@@ -185,13 +185,13 @@ string getCookie(httplib::Result result) {
 }
 
 void play(int* val, mutex& mtx, torch::jit::script::Module& net, int best_idx, torch::Device device,
-	int step_idx, int *done, httplib::Client* http, string& cookie) {
+	int step_idx, int *done, httplib::Client* http, string& username) {
 	shared_ptr<MCTS> mcts_store = make_shared<MCTS>();
 	while (1) {
 		chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 		int a, game_steps;
 		tie(a, game_steps) = play_game(val, mcts_store, nullptr, &net, &net, 20,
-			20, best_idx, "/selfplay15", cookie, device, http);
+			8, best_idx, "/selfplay16", username, device, http);
 		chrono::steady_clock::time_point end = chrono::steady_clock::now();
 		float dt = chrono::duration_cast<chrono::milliseconds>(end - begin).count() / 1000.f;
 		float speed_steps = game_steps / dt;
@@ -290,7 +290,7 @@ int main(int argc, char** argv)
 	
 	if (kind == "human")
 		while (1)
-			play_game(net, 7, device);
+			play_game(net, 17, device);
 	if (kind == "ai") {
 		ifstream f(modelfile2.c_str());
 		torch::jit::script::Module net2;
@@ -321,8 +321,8 @@ int main(int argc, char** argv)
 			cout << buf;
 		}
 	}else if(kind == "self") {
-		httplib::Client *http = new httplib::Client(domain);
-		string username, password, cookie;
+		auto http = new httplib::Client(domain);
+		string username, password;
 		while (1) {
 			bool createf = false;
 			cout << "user ID (to create, enter 0): "; getline(cin, username);
@@ -350,7 +350,6 @@ int main(int argc, char** argv)
 				cout << "문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.";
 				return 0;
 			}
-			cookie = getCookie(result);
 			json hr = json::parse(result->body);
 			if (hr["status"] == "ok") break;
 			if (hr["status"] == "dup") {
@@ -408,7 +407,7 @@ int main(int argc, char** argv)
 			for (int i = 0; i < num_thread; i++) {
 				done[i] = 0;
 				processes.emplace_back(thread(play, mar, ref(mtx), ref(net), best_idx, device,
-					step_idx, &done[i], http, ref(cookie)));
+					step_idx, &done[i], http, ref(username)));
 			}
 			while (1) {
 				chrono::milliseconds timespan(500); this_thread::sleep_for(timespan);
@@ -425,11 +424,6 @@ int main(int argc, char** argv)
 			delete http;
 			if (serrn > 20 * num_thread) break;;
 			http = new httplib::Client(domain);
-			string js = R"({ "username":")" + username + R"(", "password" :")" + password + R"(", "createf" :false })";
-			auto result = http->Post(UURL, js, "application/json");
-			if (!result || result->status != 200)
-				cout << "문제가 지속되면 프로젝트 사이트에서 프로그램을 다시 다운로드하세요.";
-			else cookie = getCookie(result);
 		}
 	}
 }

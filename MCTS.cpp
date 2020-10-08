@@ -36,7 +36,7 @@ tuple<float, string, int, vector<string>, vector<int>> MCTS::find_leaf(string st
         auto values_avg = value_avg[cur_state];
 
         auto movel = possible_moves(cur_state, cur_player, step);
-        int alen = actions.size();
+        const int alen = actions.size();
         vector<double> noises;
         if (alen < 1) {
             vector<double> dr; for (int i = 0; i < movel.size(); i++) dr.push_back(0.17);
