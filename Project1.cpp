@@ -251,27 +251,29 @@ int main(int argc, char** argv)
 	struct option longopts[] = {
 		{ "cuda", 0, nullptr, 'c' },
 		{ "model", 1, nullptr, 'm' },
-		{ "model2", 1, nullptr, 'n' },
+		{ "model2", 1, nullptr, 'o' },
 		{ "kind", 1, nullptr, 'k' },
 		{ "thread", 1, nullptr, 't' },
+		{ "gpunum", 1, nullptr, 'n' },
 		{ 0, 0, 0, 0 }
 	};
-	bool cudaf = false; int num_thread = 1;
+	bool cudaf = false; int num_thread = 1, gpu_num=0;
 	string modelfile = "./best_model.pt", modelfile2, kind = "self";
-	while ((opt = getopt_long(argc, argv, "cm:k:n:t:", longopts, nullptr)) != -1)
+	while ((opt = getopt_long(argc, argv, "cm:k:o:t:n:", longopts, nullptr)) != -1)
 	{
 		switch (opt)
 		{
 		case 'c': cudaf = true; break;
 		case 'm': modelfile = optarg; break;
-		case 'n': modelfile2 = optarg; break;
+		case 'o': modelfile2 = optarg; break;
 		case 'k': kind = optarg; break;;
 		case 't': num_thread = stoi(optarg); break;;
+		case 'n': gpu_num = stoi(optarg)-1; break;;
 		default: break;
 		}
 	}
 
-	const torch::Device device(cudaf ? torch::kCUDA : torch::kCPU);
+	const torch::Device device = cudaf ? torch::Device(torch::kCUDA, gpu_num) : torch::Device(torch::kCPU);
 	cout << device << endl;
 
 	actionTable();

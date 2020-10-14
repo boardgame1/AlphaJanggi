@@ -51,9 +51,6 @@ tuple<int, int> play_game(int* value, shared_ptr<MCTS> mcts, shared_ptr<MCTS> mc
     int net1_result = 9;
 
     while (net1_result > 5 && (value==nullptr || value[0]>0)) {
-#ifdef _WIN32
-        mcts_stores[cur_player]->clear();
-#endif
         mcts_stores[cur_player]->search_batch(mcts_searches, state,
             cur_player, nets[cur_player], step, device);
         vector<int> const movel = possible_moves(state, cur_player, step);
