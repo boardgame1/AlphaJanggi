@@ -8,10 +8,11 @@ An implementation of the AlphaZero algorithm for Janggi (Korean chess)
 여러분의 참여로 이 프로그램의 장기 인공지능 실력을 높일 수 있습니다.<br>
 self-play를 실행해 놓는 것만으로 알파 장기의 기력 향상에 도움을 줄 수 있습니다.<br>
 ```bash
-Project1 -k self --cuda -t 3
+Project1 -k self --cuda -t 3 -n 1
 ```
-&nbsp;&nbsp; -t: 쓰레드 갯수 (디폴트=1)<br>
 &nbsp;&nbsp; --cuda: nvidia 그래픽 카드 사용시<br>
+&nbsp;&nbsp; -t: 쓰레드 갯수 (디폴트=1)<br>
+&nbsp;&nbsp; -n: 그래픽 카드 번호 (디폴트=1)<br>
 <br>
 human_vs_ai는 텍스트 기반으로 인공지능과 대국할 수 있는 프로그램입니다.<br>
 ```bash
