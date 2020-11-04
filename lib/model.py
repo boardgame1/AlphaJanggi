@@ -17,68 +17,96 @@ class Net(nn.Module):
         self.conv_in = nn.Sequential(
             nn.Conv2d(input_shape[0], NUM_FILTERS, kernel_size=3, padding=1),
             nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-
         self.conv_1 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_2 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_3 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_4 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_5 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_6 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_7 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_8 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_9 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_10 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_11 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_12 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_13 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_14 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_15 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_16 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_17 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_18 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_19 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
         self.conv_20 = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv_21 = nn.Sequential(
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv_22 = nn.Sequential(
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv_23 = nn.Sequential(
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv_24 = nn.Sequential(
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv_25 = nn.Sequential(
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv_26 = nn.Sequential(
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv_27 = nn.Sequential(
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv_28 = nn.Sequential(
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv_29 = nn.Sequential(
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv_30 = nn.Sequential(
+                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
+                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
 
         body_out_shape = (NUM_FILTERS, ) + input_shape[1:]
 
@@ -136,6 +164,16 @@ class Net(nn.Module):
         v = v + self.conv_18(v)
         v = v + self.conv_19(v)
         v = v + self.conv_20(v)
+        v = v + self.conv_21(v)
+        v = v + self.conv_22(v)
+        v = v + self.conv_23(v)
+        v = v + self.conv_24(v)
+        v = v + self.conv_25(v)
+        v = v + self.conv_26(v)
+        v = v + self.conv_27(v)
+        v = v + self.conv_28(v)
+        v = v + self.conv_29(v)
+        v = v + self.conv_30(v)
         val = self.conv_val(v)
         val = self.value(val.view(batch_size, -1))
         pol = self.conv_policy(v)
