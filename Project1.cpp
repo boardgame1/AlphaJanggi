@@ -33,7 +33,7 @@ void render(string pan_str, int player_human) {
 
 string masang[] = { "마상마상", "상마상마", "마상상마", "상마마상" };
 int mcts_searches = 60;
-const int LEVELC = 300;
+const int LEVELC = 200;
 int pani[10][9] = { {2, 0, 0, 6, 0, 6, 0, 0, 2}, {0, 0, 0, 0, 1, 0, 0, 0, 0}, {0, 3, 0, 0, 0, 0, 0, 3, 0}, {7, 0, 7, 0, 7, 0, 7, 0, 7},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0}, {17, 0, 17, 0, 17, 0, 17, 0, 17}, {0, 13, 0, 0, 0, 0, 0, 13, 0},
 	{0, 0, 0, 0, 11, 0, 0, 0, 0}, {12, 0, 0, 16, 0, 16, 0, 0, 12} };
@@ -258,7 +258,7 @@ int main(int argc, char** argv)
 		{ 0, 0, 0, 0 }
 	};
 	bool cudaf = false; int num_thread = 1, gpu_num=0;
-	string modelfile = "./best_model.pt", modelfile2, kind = "self";
+	string modelfile = "./best_model.pt", modelfile2, kind = "human";
 	while ((opt = getopt_long(argc, argv, "cm:k:o:t:n:", longopts, nullptr)) != -1)
 	{
 		switch (opt)
