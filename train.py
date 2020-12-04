@@ -16,23 +16,15 @@ import torch.multiprocessing as mp
 
 PLAY_EPISODES = 25
 REPLAY_BUFFER = 30000
-LEARNING_RATE = 0.1
+LEARNING_RATE = 0.001
 BATCH_SIZE = 256
-TRAIN_ROUNDS = 20
+TRAIN_ROUNDS = 10
 MIN_REPLAY_TO_TRAIN = 10000
 
 BEST_NET_WIN_RATIO = 0.499
 NUM_PROC = 10
 EVALUATION_ROUNDS = 100
 
-"""with open('archive/data.pkl', 'rb') as file:
-     data_list = []
-     while True:
-         try:
-             data = pickle.load(file)
-         except EOFError:
-             break
-         data_list.append(data)"""
 def eval(val, lock, net1, net2, device, cpuf):
     if cpuf: net1.to(device); net2.to(device)
     mcts_stores = [mcts.MCTS(), mcts.MCTS()]
