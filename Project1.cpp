@@ -33,7 +33,7 @@ void render(string pan_str, int player_human) {
 
 string masang[] = { "마상마상", "상마상마", "마상상마", "상마마상" };
 int mcts_searches = 60;
-const int LEVELC = 200;
+const int LEVELC = 311;
 int pani[10][9] = { {2, 0, 0, 6, 0, 6, 0, 0, 2}, {0, 0, 0, 0, 1, 0, 0, 0, 0}, {0, 3, 0, 0, 0, 0, 0, 3, 0}, {7, 0, 7, 0, 7, 0, 7, 0, 7},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0}, {17, 0, 17, 0, 17, 0, 17, 0, 17}, {0, 13, 0, 0, 0, 0, 0, 13, 0},
 	{0, 0, 0, 0, 11, 0, 0, 0, 0}, {12, 0, 0, 16, 0, 16, 0, 0, 12} };
@@ -51,7 +51,7 @@ void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::
 		cout << "플레이하려는 진영을 선택하세요 0) 초, 1)한 ?";
 		string s; getline(cin, s);
 		if (s.find("level") != string::npos) {
-			mcts_searches = LEVELC * stoi(s.substr(6));
+			mcts_searches = 200 + LEVELC * (stoi(s.substr(6))-1);
 			cout << "OK" << endl;
 		}
 		else {
@@ -92,7 +92,7 @@ void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::
 					exitf = true; break;
 				}
 				if (s.find("level") != string::npos) {
-					mcts_searches = LEVELC * stoi(s.substr(6));
+					mcts_searches = 200 + LEVELC * (stoi(s.substr(6))-1);
 					cout << "OK" << endl;
 				}
 				else if (step < 2) {
@@ -258,7 +258,7 @@ int main(int argc, char** argv)
 		{ 0, 0, 0, 0 }
 	};
 	bool cudaf = false; int num_thread = 1, gpu_num=0;
-	string modelfile = "./best_model.pt", modelfile2, kind = "human";
+	string modelfile = "./best_model.pt", modelfile2, kind = "self";
 	while ((opt = getopt_long(argc, argv, "cm:k:o:t:n:", longopts, nullptr)) != -1)
 	{
 		switch (opt)
@@ -389,7 +389,7 @@ int main(int argc, char** argv)
 					myfile.write(data, data_length);
 					bool b = total / 1'000'000 != (total + data_length) / 1'000'000;
 					total += data_length;
-					if (b) cout << "\r " << total / 1'000'000 << " M" << flush;
+					if (b) cout << "\rdownloading " << total / 1'000'000 << " M" << flush;
 					return true;
 				});
 				cout << endl; myfile.close();
