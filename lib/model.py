@@ -3,182 +3,63 @@ import numpy as np
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from lib import game, mcts, webFunction, actionTable
 
 
-NUM_FILTERS = 192
-OBS_SHAPE = (15, game.GAME_ROWS, game.GAME_COLS)
+NUM_FILTERS = 512
+OBS_SHAPE = (1, game.GAME_ROWS, game.GAME_COLS)
 
 class Net(nn.Module):
-    def __init__(self, input_shape, actions_n):
+    def __init__(self, actions_n):
         super(Net, self).__init__()
 
-        self.conv_in = nn.Sequential(
-            nn.Conv2d(input_shape[0], NUM_FILTERS, kernel_size=3, padding=1),
-            nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_1 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_2 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_3 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_4 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_5 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_6 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_7 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_8 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_9 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_10 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_11 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_12 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_13 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_14 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_15 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_16 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_17 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_18 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_19 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_20 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_21 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_22 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_23 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_24 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_25 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_26 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_27 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_28 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_29 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
-        self.conv_30 = nn.Sequential(
-                nn.Conv2d(NUM_FILTERS, NUM_FILTERS, kernel_size=3, padding=1),
-                nn.BatchNorm2d(NUM_FILTERS), nn.LeakyReLU())
+        self.conv1 = nn.Conv2d(1, NUM_FILTERS, 3, padding=1)
+        self.conv2 = nn.Conv2d(NUM_FILTERS, NUM_FILTERS, 3, padding=1)
+        self.convA = nn.Conv2d(NUM_FILTERS, NUM_FILTERS, 3)
+        self.convB = nn.Conv2d(NUM_FILTERS, NUM_FILTERS, 3)
 
-        body_out_shape = (NUM_FILTERS, ) + input_shape[1:]
+        self.bn1 = nn.BatchNorm2d(NUM_FILTERS)
+        self.bn2 = nn.BatchNorm2d(NUM_FILTERS)
+        self.bnA = nn.BatchNorm2d(NUM_FILTERS)
+        self.bnB = nn.BatchNorm2d(NUM_FILTERS)
 
-        self.conv_val = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, 1, kernel_size=1),
-            nn.BatchNorm2d(1),
-            nn.LeakyReLU()
-        )
-        conv_val_size = self._get_conv_val_size(body_out_shape)
-        self.value = nn.Sequential(
-            nn.Linear(conv_val_size, 20),
-            nn.LeakyReLU(),
-            nn.Linear(20, 1),
-            nn.Tanh()
-        )
+        self.fc1 = nn.Linear(NUM_FILTERS * (game.GAME_ROWS - 4) * (game.GAME_COLS - 4), 1024)
+        self.fc_bn1 = nn.BatchNorm1d(1024)
 
-        self.conv_policy = nn.Sequential(
-            nn.Conv2d(NUM_FILTERS, 4, kernel_size=1),
-            nn.BatchNorm2d(4),
-            nn.LeakyReLU()
-        )
-        conv_policy_size = self._get_conv_policy_size(body_out_shape)
-        self.policy = nn.Sequential(
-            nn.Linear(conv_policy_size, actions_n)
-        )
+        self.fc2 = nn.Linear(1024, 512)
+        self.fc_bn2 = nn.BatchNorm1d(512)
 
-    def _get_conv_val_size(self, shape):
-        o = self.conv_val(torch.zeros(1, *shape))
-        return int(np.prod(o.size()))
+        self.fc3 = nn.Linear(512, actions_n)
 
-    def _get_conv_policy_size(self, shape):
-        o = self.conv_policy(torch.zeros(1, *shape))
-        return int(np.prod(o.size()))
+        self.fc4 = nn.Linear(512, 1)
 
-    def forward(self, x):
-        batch_size = x.size()[0]
-        v = self.conv_in(x)
-        v = v + self.conv_1(v)
-        v = v + self.conv_2(v)
-        v = v + self.conv_3(v)
-        v = v + self.conv_4(v)
-        v = v + self.conv_5(v)
-        v = v + self.conv_6(v)
-        v = v + self.conv_7(v)
-        v = v + self.conv_8(v)
-        v = v + self.conv_9(v)
-        v = v + self.conv_10(v)
-        v = v + self.conv_11(v)
-        v = v + self.conv_12(v)
-        v = v + self.conv_13(v)
-        v = v + self.conv_14(v)
-        v = v + self.conv_15(v)
-        v = v + self.conv_16(v)
-        v = v + self.conv_17(v)
-        v = v + self.conv_18(v)
-        v = v + self.conv_19(v)
-        v = v + self.conv_20(v)
-        v = v + self.conv_21(v)
-        v = v + self.conv_22(v)
-        v = v + self.conv_23(v)
-        v = v + self.conv_24(v)
-        v = v + self.conv_25(v)
-        v = v + self.conv_26(v)
-        v = v + self.conv_27(v)
-        v = v + self.conv_28(v)
-        v = v + self.conv_29(v)
-        v = v + self.conv_30(v)
-        val = self.conv_val(v)
-        val = self.value(val.view(batch_size, -1))
-        pol = self.conv_policy(v)
-        pol = self.policy(pol.view(batch_size, -1))
-        return pol, val
+        self.dropout = 0.3
+
+    def train(self, mode: bool = True):
+        super(Net, self).train(mode)
+        self.training = mode
+
+    def eval(self):
+        super(Net, self).eval()
+        self.training = False
+
+    def forward(self, s):
+        s = s.view(-1, 1, game.GAME_ROWS, game.GAME_COLS)            # batch_size x 1 x board_x x board_y
+        s = F.relu(self.bn1(self.conv1(s)))                          # batch_size x num_channels x board_x x board_y
+        s = F.relu(self.bn2(self.conv2(s)))                          # batch_size x num_channels x board_x x board_y
+        s = F.relu(self.bnA(self.convA(s)))                          # batch_size x num_channels x (board_x-2) x (board_y-2)
+        s = F.relu(self.bnB(self.convB(s)))                          # batch_size x num_channels x (board_x-4) x (board_y-4)
+        s = s.view(-1, NUM_FILTERS*(game.GAME_ROWS-4)*(game.GAME_COLS-4))
+
+        s = F.dropout(F.relu(self.fc_bn1(self.fc1(s))), p=self.dropout, training=self.training)  # batch_size x 1024
+        s = F.dropout(F.relu(self.fc_bn2(self.fc2(s))), p=self.dropout, training=self.training)  # batch_size x 512
+
+        pi = self.fc3(s)                                                                         # batch_size x action_size
+        v = self.fc4(s)                                                                          # batch_size x 1
+
+        return pi, torch.tanh(v)
 
 
 def _encode_list_state(dest_np, state_list, step):
@@ -188,13 +69,7 @@ def _encode_list_state(dest_np, state_list, step):
     for row_idx, row in enumerate(state_list):
         for col_idx, cell in enumerate(row):
             if cell>0:
-                dest_np[cell%10-1+(cell//10 if who_move<1 else 1-cell//10)*7, row_idx, col_idx] = 1.0
-    ci=8
-    while step>0:
-        if step%2>0: dest_np[14, 0, ci] = 1.0
-        step //=2
-        ci -= 1
-    if who_move>0: dest_np[14, 9, 0] = 1.0
+                dest_np[0, row_idx, col_idx] = cell%10*((cell//10 if who_move<1 else 1-cell//10)*2-1)
 
 def state_lists_to_batch(state_lists, steps_lists, device="cpu"):
     assert isinstance(state_lists, list)
