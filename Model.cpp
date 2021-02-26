@@ -6,27 +6,20 @@ void _encode_list_state(float dest_np[][10][9], int state_list[][9], int step) {
         for (int col_idx = 0; col_idx < 9; col_idx++) {
             int cell = state_list[row_idx][col_idx];
             if (cell > 0)
-                dest_np[cell % 10 - 1 + (who_move < 1 ? cell / 10 : 1 - cell / 10) * 7][row_idx][col_idx] = 1.0f;
+                dest_np[0][row_idx][col_idx] = cell % 10 * ((who_move < 1 ? cell / 10 : 1 - cell / 10) * 2 - 1);
         }
-    int ci = 8;
-    while (step > 0) {
-        if (step % 2 > 0) dest_np[14][0][ci] = 1.0f;
-        step /= 2;
-        ci -= 1;
-    }
-    if (who_move > 0) dest_np[14][9][0] = 1.0f;
 }
 
 torch::jit::IValue state_lists_to_batch(const vector<string>& state_lists, const vector<int>& steps_lists, torch::Device device) {
     const int batch_size = state_lists.size();
-    float batch[BATCH_SIZE][15][10][9] = { 0, };
+    float batch[BATCH_SIZE][1][10][9] = { 0, };
     for (int idx = 0; idx < batch_size; idx++) {
         auto state = state_lists[idx];
         int pan[10][9]; decode_binary(pan, state);
         int step = steps_lists[idx];
         _encode_list_state(batch[idx], pan, step);
     }
-    torch::jit::IValue t = torch::from_blob(batch, { batch_size, 15,10,9 }).to(device);
+    torch::jit::IValue t = torch::from_blob(batch, { batch_size, 1,10,9 }).to(device);
     return t;
 }
 
