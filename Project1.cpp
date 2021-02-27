@@ -9,7 +9,7 @@
 	#include <getopt.h>
 #endif
 
-const char* domain = "alphajanggi.net"; const char* UURL = "/user16";
+const char* domain = "alphajanggi.net"; const char* UURL = "/user17";
 
 string piece_str = "초차포마상사졸漢車包馬象士兵";
 void render(string pan_str, int player_human) {
@@ -191,7 +191,7 @@ void play(int* val, mutex& mtx, torch::jit::script::Module& net, int best_idx, t
 		chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 		int a, game_steps;
 		tie(a, game_steps) = play_game(val, mcts_store, nullptr, &net, &net, 20,
-			8, best_idx, "/selfplay16", username, device, http);
+			8, best_idx, "/selfplay17", username, device, http);
 		chrono::steady_clock::time_point end = chrono::steady_clock::now();
 		float dt = chrono::duration_cast<chrono::milliseconds>(end - begin).count() / 1000.f;
 		float speed_steps = game_steps / dt;
