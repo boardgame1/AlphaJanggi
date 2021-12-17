@@ -30,11 +30,11 @@ def decode_binary(state_str):
     return pan
 
 def possible_moves(pan_str, player, step):
-    pan = decode_binary(pan_str)
     moven = []
     if step<2:
         for i in range(4): moven.append(10000+i)
     else:
+        pan = decode_binary(pan_str)
         for y in range(10):
             for x in range(9):
                 ki=pan[y][x]; alk=ki//10
