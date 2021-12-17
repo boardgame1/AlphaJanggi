@@ -9,7 +9,7 @@
 	#include <getopt.h>
 #endif
 
-const char* domain = "alphajanggi.net"; const char* UURL = "/user17";
+const char* domain = "14.49.44.183"; const char* UURL = "/user17";
 
 string piece_str = "초차포마상사졸漢車包馬象士兵";
 void render(string pan_str, int player_human) {
@@ -33,11 +33,11 @@ void render(string pan_str, int player_human) {
 
 string masang[] = { "마상마상", "상마상마", "마상상마", "상마마상" };
 int mcts_searches = 60;
-const int LEVELC = 311;
 int pani[10][9] = { {2, 0, 0, 6, 0, 6, 0, 0, 2}, {0, 0, 0, 0, 1, 0, 0, 0, 0}, {0, 3, 0, 0, 0, 0, 0, 3, 0}, {7, 0, 7, 0, 7, 0, 7, 0, 7},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0}, {17, 0, 17, 0, 17, 0, 17, 0, 17}, {0, 13, 0, 0, 0, 0, 0, 13, 0},
 	{0, 0, 0, 0, 11, 0, 0, 0, 0}, {12, 0, 0, 16, 0, 16, 0, 0, 12} };
 
+int mctsNum(string s) {return 200 + 311 * (stoi(s.substr(6)) - 1);}
 void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::Device device) {
 	string pan = encode_lists(pani, 0);
 	vector<string> historystr;
@@ -51,7 +51,7 @@ void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::
 		cout << "플레이하려는 진영을 선택하세요 0) 초, 1)한 ?";
 		string s; getline(cin, s);
 		if (s.find("level") != string::npos) {
-			mcts_searches = 200 + LEVELC * (stoi(s.substr(6))-1);
+			mcts_searches = mctsNum(s);
 			cout << "OK" << endl;
 		}
 		else {
@@ -92,7 +92,7 @@ void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::
 					exitf = true; break;
 				}
 				if (s.find("level") != string::npos) {
-					mcts_searches = 200 + LEVELC * (stoi(s.substr(6))-1);
+					mcts_searches = mctsNum(s);
 					cout << "OK" << endl;
 				}
 				else if (step < 2) {
@@ -258,7 +258,7 @@ int main(int argc, char** argv)
 		{ 0, 0, 0, 0 }
 	};
 	bool cudaf = false; int num_thread = 1, gpu_num=0;
-	string modelfile = "./best_model.pt", modelfile2, kind = "self";
+	string modelfile = "./best_model.pt", modelfile2, kind = "human";
 	while ((opt = getopt_long(argc, argv, "cm:k:o:t:n:", longopts, nullptr)) != -1)
 	{
 		switch (opt)
@@ -267,8 +267,8 @@ int main(int argc, char** argv)
 		case 'm': modelfile = optarg; break;
 		case 'o': modelfile2 = optarg; break;
 		case 'k': kind = optarg; break;;
-		case 't': num_thread = stoi(optarg); break;;
-		case 'n': gpu_num = stoi(optarg)-1; break;;
+		case 't': num_thread = stoi(optarg); break;
+		case 'n': gpu_num = stoi(optarg)-1; break;
 		default: break;
 		}
 	}
@@ -278,12 +278,20 @@ int main(int argc, char** argv)
 
 	actionTable();
 	torch::jit::script::Module net;
+	LoadLibraryA("ATen_cuda.dll");
+	LoadLibraryA("c10_cuda.dll");
+	LoadLibraryA("torch_cuda.dll");
+	LoadLibraryA("torchvision.dll");
 	if (kind == "human" || kind == "ai") {
 		ifstream f(modelfile.c_str());
-		if (f.good()) {
+		if (f.good()) try{
 			net = torch::jit::load(modelfile);
 			net.to(device);
 			net.train(false);
+		}
+		catch (const c10::Error& e) {
+			std::cerr << "error loading the model\n"<<e.msg();
+			return -1;
 		}
 		else {
 			cout << modelfile + " 파일이 존재하지 않습니다"; return 1;
@@ -327,7 +335,7 @@ int main(int argc, char** argv)
 		string username, password;
 		while (1) {
 			bool createf = false;
-			cout << "user ID (to create, enter 0): "; getline(cin, username);
+			/*cout << "user ID (to create, enter 0): "; getline(cin, username);
 			if (username.empty()) continue;
 			if (username == "0") {
 				cout << "user ID to create: "; getline(cin, username);
@@ -344,7 +352,7 @@ int main(int argc, char** argv)
 				string password1 = getpasswd();
 				if (password1.empty()) continue;
 				password = password1;
-			}
+			}*/username="game";password="qaz";
 			username = toutf8(username);
 			string js = R"({ "username":")" + username + R"(", "password" :")" + password + R"(", "createf" :)" + string(createf ? "true" : "false") + " }";
 			auto result = http->Post(UURL, js, "application/json");
