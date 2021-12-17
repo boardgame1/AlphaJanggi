@@ -16,12 +16,12 @@ import torch.multiprocessing as mp
 
 PLAY_EPISODES = 25
 REPLAY_BUFFER = 30000
-LEARNING_RATE = 0.00001
+LEARNING_RATE = 0.001
 BATCH_SIZE = 256
 TRAIN_ROUNDS = 10
 MIN_REPLAY_TO_TRAIN = 10000
 
-BEST_NET_WIN_RATIO = 0.499
+BEST_NET_WIN_RATIO = 0.55
 NUM_PROC = 10
 EVALUATION_ROUNDS = 100
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     parser.add_argument("-tm", "--tmodel", help="Temp model")
     parser.add_argument("--pt", default=False, action="store_true", help="save pt")
     args = parser.parse_args()
-    device = torch.device("cuda:0" if args.cuda else "cpu")
+    device = torch.device("cuda:1" if args.cuda else "cpu")
 
     saves_path = "saves"
     os.makedirs(saves_path, exist_ok=True)
@@ -60,14 +60,14 @@ if __name__ == "__main__":
     step_idx = 0
 
     checkpoint = torch.load(args.model, map_location=lambda storage, loc: storage)
-    best_net = model.Net(actionTable.AllMoveLength).to(device)
+    best_net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
     best_net.load_state_dict(checkpoint['model'])
     best_idx = checkpoint['best_idx']
     #print(best_net)
     if args.tmodel:
         checkpoint = torch.load(args.tmodel, map_location=lambda storage, loc: storage)
         if best_idx != checkpoint['best_idx']: print('invalid tmodel'); sys.exit()
-        net = model.Net(actionTable.AllMoveLength).to(device)
+        net = model.Net(input_shape=model.OBS_SHAPE, actions_n=actionTable.AllMoveLength).to(device)
         net.load_state_dict(checkpoint['model'])
     else: net = copy.deepcopy(best_net)
     best_net.eval()
