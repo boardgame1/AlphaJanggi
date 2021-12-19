@@ -9,7 +9,7 @@
 	#include <getopt.h>
 #endif
 
-const char* domain = "14.49.44.183"; const char* UURL = "/user17";
+const char* domain = "alphajanggi.net"; const char* UURL = "/user17";
 
 string piece_str = "초차포마상사졸漢車包馬象士兵";
 void render(string pan_str, int player_human) {
@@ -176,14 +176,6 @@ void play_game(torch::jit::script::Module& net1, int steps_before_tau_0, torch::
 	}
 }
 
-string getCookie(httplib::Result result) {
-	string cookie;
-	auto hd = result->headers;
-	for (auto nc : hd)
-		if (nc.first == "Set-Cookie") cookie = nc.second;
-	return cookie;
-}
-
 void play(int* val, mutex& mtx, torch::jit::script::Module& net, int best_idx, torch::Device device,
 	int step_idx, int *done, httplib::Client* http, string& username) {
 	shared_ptr<MCTS> mcts_store = make_shared<MCTS>();
@@ -278,10 +270,11 @@ int main(int argc, char** argv)
 
 	actionTable();
 	torch::jit::script::Module net;
+#ifdef _WIN32
 	LoadLibraryA("ATen_cuda.dll");
 	LoadLibraryA("c10_cuda.dll");
 	LoadLibraryA("torch_cuda.dll");
-	LoadLibraryA("torchvision.dll");
+#endif
 	if (kind == "human" || kind == "ai") {
 		ifstream f(modelfile.c_str());
 		if (f.good()) try{
