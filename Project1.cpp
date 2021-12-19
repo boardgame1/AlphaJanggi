@@ -335,7 +335,7 @@ int main(int argc, char** argv)
 		string username, password;
 		while (1) {
 			bool createf = false;
-			/*cout << "user ID (to create, enter 0): "; getline(cin, username);
+			cout << "user ID (to create, enter 0): "; getline(cin, username);
 			if (username.empty()) continue;
 			if (username == "0") {
 				cout << "user ID to create: "; getline(cin, username);
@@ -352,7 +352,7 @@ int main(int argc, char** argv)
 				string password1 = getpasswd();
 				if (password1.empty()) continue;
 				password = password1;
-			}*/username="game";password="qaz";
+			}
 			username = toutf8(username);
 			string js = R"({ "username":")" + username + R"(", "password" :")" + password + R"(", "createf" :)" + string(createf ? "true" : "false") + " }";
 			auto result = http->Post(UURL, js, "application/json");
