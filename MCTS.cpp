@@ -62,7 +62,7 @@ tuple<float, string, int, vector<string>, vector<int>> MCTS::find_leaf(string st
         step += 1;
     }
 
-    if (value < 5) value *= 1 - (MAX_TURN - step) / 1000.f;
+    if (value < 5) value *= 1 - step / 1000.f;
     return make_tuple( value, cur_state, step, states, actions );
 }
 
