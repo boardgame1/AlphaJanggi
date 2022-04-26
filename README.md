@@ -3,7 +3,6 @@ An implementation of the AlphaZero algorithm for Janggi (Korean chess)
 
 '알파 장기'는 AlphaZero 알고리즘을 적용한 장기 인공지능 프로그램입니다.<br>
 사용 언어는 c++와 python이고 pytorch 라이브러리를 사용했습니다.<br>
-웹 사이트: https://alphajanggi.net<br>
 <br>
 여러분의 참여로 이 프로그램의 장기 인공지능 실력을 높일 수 있습니다.<br>
 self-play를 실행해 놓는 것만으로 알파 장기의 기력 향상에 도움을 줄 수 있습니다.<br>
